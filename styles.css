@@ -1,0 +1,163 @@
+body {
+    font-family: 'Sriracha', sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #fff;
+}
+
+.hero {
+    position: relative;
+    text-align: center;
+    color: white;
+    background: url('hero.jpg') center/cover no-repeat;
+    height: 60vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.hero .overlay {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.4);
+}
+
+.hero h1 {
+    font-size: 4rem;
+    z-index: 1;
+}
+
+.hero nav {
+    z-index: 1;
+}
+
+.hero nav a {
+    color: white;
+    text-decoration: none;
+    margin: 0 15px;
+    font-size: 1.2rem;
+}
+
+.room-info {
+    display: flex;
+    align-items: center;
+    padding: 40px;
+    gap: 40px;
+}
+
+.room-info img {
+    width: 40%;
+    border-radius: 10px;
+}
+
+.room-details {
+    width: 50%;
+}
+
+.room-details h2 {
+    font-size: 2rem;
+    margin-bottom: 10px;
+}
+
+.price {
+    font-size: 1.5rem;
+    color: green;
+}
+
+.book-btn {
+    background: orange;
+    color: white;
+    font-size: 1.5rem;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.book-btn:hover {
+    background: darkorange;
+}
+
+.booking-calendar {
+    text-align: center;
+    padding: 40px;
+}
+
+.booking-calendar img {
+    width: 60%;
+    border-radius: 10px;
+}
+
+.facilities {
+    text-align: center;
+    padding: 40px;
+}
+
+.facility-list img {
+    width: 80%;
+    border-radius: 10px;
+}
+
+footer {
+    background: #2c3e50;
+    color: white;
+    text-align: center;
+    padding: 20px;
+}
+
+footer nav a {
+    color: white;
+    margin: 0 15px;
+    text-decoration: none;
+}
+
+.scroll-top {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    background: yellow;
+    border: none;
+    padding: 10px 15px;
+    font-size: 1.5rem;
+    border-radius: 50%;
+    cursor: pointer;
+    display: none;
+}
+
+.scroll-top:hover {
+    background: orange;
+}
+
+@media (max-width: 768px) {
+    .hero h1 {
+        font-size: 3rem;
+    }
+
+    .hero nav a {
+        font-size: 1rem;
+    }
+
+    .room-info {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .room-info img {
+        width: 90%;
+    }
+
+    .room-details {
+        width: 90%;
+        text-align: center;
+    }
+
+    .booking-calendar img {
+        width: 90%;
+    }
+
+    .facility-list img {
+        width: 90%;
+    }
+}
