@@ -8,6 +8,8 @@ $modal_type = $_SESSION['modal_type'] ?? '';
 unset($_SESSION['modal_message'], $_SESSION['modal_type']);
 
 $error_message = "";
+$usernameOrEmail = "";
+
 if (!empty($_SERVER['HTTP_REFERER']) && parse_url($_SERVER['HTTP_REFERER'], PHP_URL_HOST) === $_SERVER['HTTP_HOST']) {
     $referer_page = basename(parse_url($_SERVER['HTTP_REFERER'], PHP_URL_PATH));
     if (!in_array($referer_page, ["login.php", "reset_password.php", "process_reset_password.php"])) {
@@ -15,51 +17,57 @@ if (!empty($_SERVER['HTTP_REFERER']) && parse_url($_SERVER['HTTP_REFERER'], PHP_
     }
 }
 
-if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    $usernameOrEmail = trim($_POST['username']);
-    $password = $_POST['password'];
+if ($_SERVER["REQUEST_METHOD"] === "POST") {
+    $usernameOrEmail = trim($_POST['username'] ?? '');
+    $password = $_POST['password'] ?? '';
 
-    $sql = "SELECT * FROM users WHERE username = ? OR email = ?";
-    if ($stmt = $conn->prepare($sql)) {
-        $stmt->bind_param("ss", $usernameOrEmail, $usernameOrEmail);
-        $stmt->execute();
-        $result = $stmt->get_result();
+    if ($usernameOrEmail === "" || $password === "") {
+        $error_message = "⚠️ กรุณากรอกข้อมูลให้ครบถ้วน!";
+    } else {
+        $sql = "SELECT * FROM users WHERE (username = ? OR email = ?) AND deleted_at IS NULL LIMIT 1";
 
-        if ($result->num_rows == 1) {
-            $user = $result->fetch_assoc();
-            if (password_verify($password, $user['password'])) {
-                $_SESSION['user_id'] = $user['user_id'];
-                $_SESSION['first_name'] = $user['first_name'];
-                $_SESSION['last_name'] = $user['last_name'];
-                $_SESSION['userrole'] = $user['userrole'];
-                $_SESSION['username'] = $user['username'];
-                $_SESSION['email'] = $user['email'];
+        if ($stmt = $conn->prepare($sql)) {
+            $stmt->bind_param("ss", $usernameOrEmail, $usernameOrEmail);
+            $stmt->execute();
+            $result = $stmt->get_result();
 
-                if ($user['userrole'] == 'admin') {
-                    $redirect_page = "admin_dashboard.php";
-                } else {
-                    if (isset($_SESSION['redirect_to']) && basename($_SESSION['redirect_to']) === "register.php") {
-                        $redirect_page = "index.php";
+            if ($result->num_rows === 1) {
+                $user = $result->fetch_assoc();
+
+                if (password_verify($password, $user['password'])) {
+                    $_SESSION['user_id'] = $user['user_id'];
+                    $_SESSION['first_name'] = $user['first_name'];
+                    $_SESSION['last_name'] = $user['last_name'];
+                    $_SESSION['username'] = $user['username'];
+                    $_SESSION['email'] = $user['email'];
+                    $_SESSION['userrole'] = $user['userrole'];
+
+                    if ($user['userrole'] === 'admin') {
+                        $redirect_page = "admin_dashboard.php";
                     } else {
-                        $redirect_page = $_SESSION['redirect_to'] ?? 'index.php';
+                        $redirect_page = "index.php";
                     }
-                    unset($_SESSION['redirect_to']);
-                }
 
-                header("Location: " . $redirect_page);
-                exit();
+                    header("Location: $redirect_page");
+                    exit();
+                } else {
+                    $error_message = "❌ รหัสผ่านไม่ถูกต้อง!";
+                }
             } else {
-                $error_message = "❌ รหัสผ่านไม่ถูกต้อง!";
+                $error_message = "⚠️ ไม่มีผู้ใช้งานหรืออีเมลนี้อยู่ในระบบ หรือบัญชีถูกลบแล้ว!";
             }
+
+            $stmt->close();
         } else {
-            $error_message = "⚠️ ไม่มีผู้ใช้งานหรืออีเมลนี้อยู่ในระบบ!";
+            $error_message = "⚠️ เกิดข้อผิดพลาดในการเชื่อมต่อฐานข้อมูล!";
         }
-        $stmt->close();
     }
 }
+
 $conn->close();
 ob_end_flush();
 ?>
+
 
 <!DOCTYPE html>
 <html lang="th">

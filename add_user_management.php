@@ -74,7 +74,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>สมัครสมาชิก</title>
+    <title>เพิ่มข้อมูลลูกค้า</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+
     <style>
     body {
         font-family: 'Prompt', sans-serif;
@@ -123,18 +127,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         font-size: 16px;
     }
 
-    button {
-        width: 100%;
-        padding: 12px;
-        background: #8c99bc;
-        color: white;
-        border: none;
-        border-radius: 8px;
-        font-size: 18px;
-        cursor: pointer;
-        transition: background 0.3s;
-        margin-top: 15px;
-    }
 
     a {
         display: block;
@@ -207,12 +199,54 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         font-size: 18px;
         width: fit-content;
     }
+
+    .btn-group-responsive {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 15px;
+        flex-wrap: nowrap;
+    }
+
+    .btn-group-responsive .btn {
+        flex: 1 1 200px;
+        max-width: 200px;
+    }
+
+    @media (max-width: 576px) {
+        .btn-group-responsive .btn {
+            width: 100%;
+            max-width: none;
+        }
+    }
+    
+    .btn-purple {
+        width: 20%;
+        background-color: #A996E6 !important;
+        color: white !important;
+        border: none;
+    }
+
+    .btn-purple:hover {
+        background-color: #9FA8DA !important;
+    }
+
+    .btn-cancel {
+        width: 20%;
+        background-color: #c7c5c5 !important;
+        color: black !important;
+    }
+
+    .btn-cancel:hover {
+        background-color: #E8E8E8 !important;
+    }
+    
     </style>
 </head>
 
 <body>
     <div class="container">
-        <h2>สมัครสมาชิก</h2>
+        <h2>เพิ่มข้อมูล</h2>
         <?php if (!empty($error_message)): ?>
         <div class="alert alert-danger" role="alert">
             <?php echo $error_message; ?>
@@ -242,16 +276,17 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             <label for="confirmpassword">ยืนยันรหัสผ่าน</label>
             <input type="password" id="confirmpassword" name="confirmpassword" placeholder="ยืนยันรหัสผ่าน" required>
 
-            <button type="submit">สมัครสมาชิก</button>
-            <br>
-            <a href="login.php">เข้าสู่ระบบ</a>
+            <div class="d-flex text-center btn-group-responsive mt-4">
+                <button type="submit" class="btn btn-purple">ตกลง</button>
+                <button onclick="window.location.href='user_management.php'" class="btn btn-cancel">ยกเลิก</button>
+            </div>
         </form>
     </div>
 
-    <div id="successModal" class="modal">
+    <div id="successModal" class="modal text-center">
         <div class="modal-content">
-            <h2>สมัครสมาชิกสำเร็จ!</h2>
-            <label>คุณได้สมัครสมาชิกเรียบร้อยแล้ว</<label><br>
+            <h2>เพิ่มข้อมูลสำเร็จ!</h2>
+            <p>คุณได้เพิ่มข้อมูลเรียบร้อยแล้ว</<p><br>
                 <button class="modal-button" id="modalConfirmBtn">ตกลง</button>
         </div>
     </div>
@@ -262,7 +297,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
     <?php if ($registration_success): ?>
     modal.style.display = "block";
-    const redirectToLogin = () => window.location.href = 'login.php';
+    const redirectToLogin = () => window.location.href = 'user_management.php';
     const autoRedirectTimeout = setTimeout(redirectToLogin, 3000);
 
     confirmBtn.onclick = function() {

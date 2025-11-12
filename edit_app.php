@@ -7,26 +7,29 @@ if (!isset($_SESSION['userrole']) || $_SESSION['userrole'] !== 'admin') {
     exit();
 }
 
-$showModal = false;
-$modalType = '';
-$modalMessage = '';
+$app_id = $_GET['app_id'] ?? 0;
+
+$sql_app = "SELECT * FROM applications WHERE app_id = ?";
+$stmt = $conn->prepare($sql_app);
+$stmt->bind_param("i", $app_id);
+$stmt->execute();
+$result = $stmt->get_result();
+$app = $result->fetch_assoc();
+
+if (!$app) die("ไม่พบข้อมูลแอป");
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $app_name = $_POST['app_name'];
     $real_price = $_POST['real_price'];
 
-    $sql = "INSERT INTO applications (app_name, real_price) VALUES (?, ?)";
-    $stmt = $conn->prepare($sql);
-    $stmt->bind_param("sd", $app_name, $real_price);
-
-    if ($stmt->execute()) {
-        $showModal = true;
-        $modalType = 'success';
-        $modalMessage = 'เพิ่มแอปพลิเคชันเรียบร้อยแล้ว!';
+    $sql_update = "UPDATE applications SET app_name=?, real_price=? WHERE app_id=?";
+    $stmt_update = $conn->prepare($sql_update);
+    $stmt_update->bind_param("sdi", $app_name, $real_price, $app_id);
+    if ($stmt_update->execute()) {
+        header("Location: detail_application.php?id=$app_id");
+        exit();
     } else {
-        $showModal = true;
-        $modalType = 'danger';
-        $modalMessage = 'เกิดข้อผิดพลาดในการเพิ่มข้อมูล';
+        $error = "เกิดข้อผิดพลาด: ".$stmt_update->error;
     }
 }
 ?>
@@ -37,7 +40,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>เพิ่มแอปพลิเคชัน</title>
+    <title>รายละเอียดแอปพลิเคชัน</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
@@ -114,37 +117,25 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
     }
 
-    .text-danger {
-        font-weight: bold;
-        color: red !important;
-    }
-
-    .btn-success {
-        background-color: #8c99bc;
-        border: none;
-        transition: 0.3s;
-    }
-
-    .btn-success:hover {
-        background-color: #6f7ca1;
-    }
-
-    .btn-secondary {
-        background-color: #999;
+    .btn-purple {
+        width: 20%;
+        background-color: #A996E6 !important;
+        color: white !important;
         border: none;
     }
 
-    .bg-purple {
-        background-color: #A996E6;
+    .btn-purple:hover {
+        background-color: #9FA8DA !important;
     }
 
-    .btn-confirm {
-        background-color: #F5E096FF;
+    .btn-cancel {
+        width: 20%;
+        background-color: #c7c5c5 !important;
+        color: black !important;
     }
 
-    .btn-confirm:hover {
-        background-color: #E0D29FFF;
-        color: black;
+    .btn-cancel:hover {
+        background-color: #E8E8E8 !important;
     }
     </style>
 </head>
@@ -186,61 +177,27 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         </div>
     </div>
     <div class="container-wrapper">
-        <div class="container">
-            <div class="card shadow-lg">
-                <h3 class="text-center mb-4">เพิ่มแอปพลิเคชันใหม่</h3>
-                <form method="POST">
-                    <div class="mb-3">
-                        <label class="form-label">ชื่อแอปพลิเคชัน</label>
-                        <input type="text" name="app_name" class="form-control" required>
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label">ราคาจริง (บาท/เดือน)</label>
-                        <input type="number" name="real_price" step="0.01" class="form-control" required>
-                    </div>
-                    <div class="text-center">
-                        <button type="submit" class="btn btn-confirm px-4">บันทึก</button>
-                        <a href="admin_dashboard.php" class="btn btn-light px-4">กลับ</a>
-                    </div>
-                </form>
-            </div>
-        </div>
-
-        <div class="modal fade" id="resultModal" tabindex="-1" aria-hidden="true">
-            <div class="modal-dialog modal-dialog-centered">
-                <div class="modal-content border-0 rounded-4">
-                    <div class="modal-header 
-        <?php echo ($modalType === 'success') ? 'bg-purple text-white' : 'bg-danger text-white'; ?>">
-                        <h5 class="modal-title w-100 text-center">
-                            <?php echo ($modalType === 'success') ? 'สำเร็จ' : 'เกิดข้อผิดพลาด'; ?>
-                        </h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                    </div>
-                    <div class="modal-body text-center fs-5 py-4">
-                        <?php echo $modalMessage; ?>
-                    </div>
-                    <div class="modal-footer justify-content-center">
-                        <button type="button"
-                            class="btn btn-<?php echo ($modalType === 'success') ? 'success' : 'danger'; ?>"
-                            data-bs-dismiss="modal" onclick="handleModalClose()">ตกลง</button>
-                    </div>
+        <div class="container mt-5">
+            <h2 class="mb-4">แก้ไขแอปพลิเคชัน</h2>
+            <?php if (!empty($error)) echo '<div class="alert alert-danger">'.$error.'</div>'; ?>
+            <form method="post">
+                <div class="mb-3">
+                    <label>ชื่อแอปพลิเคชัน</label>
+                    <input type="text" name="app_name" class="form-control"
+                        value="<?=htmlspecialchars($app['app_name'])?>" required>
                 </div>
-            </div>
+                <div class="mb-3">
+                    <label>ราคาจริง (บาท/เดือน)</label>
+                    <input type="number" name="real_price" class="form-control" step="0.01"
+                        value="<?=htmlspecialchars($app['real_price'])?>" required>
+                </div>
+                <div class="text-center">
+                    <button type="submit" class="btn btn-purple">บันทึก</button>
+                    <a href="detail_application.php?id=<?=$app_id?>" class="btn btn-cancel">ยกเลิก</a>
+                </div>
+            </form>
         </div>
     </div>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script>
-    <?php if ($showModal): ?>
-    var myModal = new bootstrap.Modal(document.getElementById('resultModal'));
-    myModal.show();
-
-    function handleModalClose() {
-        <?php if ($modalType === 'success'): ?>
-        window.location.href = 'admin_dashboard.php';
-        <?php endif; ?>
-    }
-    <?php endif; ?>
-    </script>
-
 </body>
+
 </html>

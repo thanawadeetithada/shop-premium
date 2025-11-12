@@ -7,7 +7,7 @@ if (!isset($_SESSION['userrole']) || $_SESSION['userrole'] !== 'admin') {
     exit();
 }
 
-$sql = "SELECT * FROM applications";
+$sql = "SELECT * FROM applications WHERE deleted_at IS NULL";
 $result = $conn->query($sql);
 ?>
 
@@ -17,7 +17,7 @@ $result = $conn->query($sql);
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ผู้ดูแลระบบ</title>
+    <title>หน้าหลัก</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
@@ -121,27 +121,39 @@ $result = $conn->query($sql);
         </div>
         <div class="offcanvas-body">
             <ul class="list-unstyled">
+                <li><a href="alert_page.php" class="text-white text-decoration-none d-block py-2"><i
+                            class="fa-solid fa-bell"></i> แจ้งเตือนรายการ</a></li>
+                <li><a href="check_list.php" class="text-white text-decoration-none d-block py-2"><i
+                            class="fa-solid fa-user-check"></i> เช็ครายชื่อ</a></li>
+                <li><a href="dashboard_income.php" class="text-white text-decoration-none d-block py-2"><i
+                            class="fa-solid fa-money-check-dollar"></i> รายรับ-รายจ่าย</a></li>
                 <li><a href="admin_dashboard.php" class="text-white text-decoration-none d-block py-2"><i
-                            class="fa-solid fa-chart-line"></i> หน้าหลัก</a></li>
+                            class="fa-solid fa-tablet-screen-button"></i> แอปพลิเคชัน</a></li>
+                <li><a href="payment.php" class="text-white text-decoration-none d-block py-2"><i
+                            class="fa-solid fa-money-bill-wave"></i> ชำระเงิน</a></li>
+                <li><a href="index.php" class="text-white text-decoration-none d-block py-2"><i
+                            class="fa-solid fa-list-check"></i> เมนู</a></li>
+                <li><a href="all_member.php" class="text-white text-decoration-none d-block py-2"><i
+                            class="fa-solid fa-user"></i> รายชื่อทั้งหมด</a></li>
                 <li><a href="user_management.php" class="text-white text-decoration-none d-block py-2"><i
-                            class="fa-regular fa-money-bill-1"></i> ข้อมูลผู้ใช้งาน</a></li>
+                            class="fa-solid fa-user-tie"></i> ข้อมูลผู้ใช้งาน</a></li>
             </ul>
         </div>
     </div>
     <div class="container-wrapper">
         <div class="container">
+            <h2>แอปพลิเคชัน</h2>
             <div class="text-add mb-3">
                 <a href="add_applications.php" class="btn btn-warning btn-add">เพิ่ม</a>
             </div>
-
-            <h2>แอปพลิเคชัน</h2>
             <div class="row">
                 <?php if ($result->num_rows > 0): ?>
                 <?php while ($row = $result->fetch_assoc()): ?>
                 <div class="col-md-6 mb-3">
                     <a href="detail_application.php?id=<?php echo $row['app_id']; ?>" class="text-decoration-none">
                         <div class="card text-center p-4 text-white">
-                            <h4><?php echo htmlspecialchars($row['app_name']); ?></h4>
+                            <h4 style="font-weight: bold;"><?php echo htmlspecialchars($row['app_name']); ?></h4>
+                            <p style="font-weight: bold;">ราคา <?php echo htmlspecialchars($row['real_price']); ?> ฿</p>
                         </div>
                     </a>
                 </div>
