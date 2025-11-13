@@ -16,7 +16,7 @@ if (!isset($_SESSION['userrole']) || $_SESSION['userrole'] !== 'admin') {
     <meta name="apple-mobile-web-app-title" content="App Premium">
     <meta name="application-name" content="App Premium">
     <meta name="theme-color" content="#96a1cd">
-    <title>ชำระเงิน</title>
+    <title>เมนู</title>
     <link rel="manifest" href="manifest.json">
     <link rel="apple-touch-icon" href="icons/icon-192.png">
     <link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png">
@@ -109,19 +109,6 @@ if (!isset($_SESSION['userrole']) || $_SESSION['userrole'] !== 'admin') {
             font-size: 0.9rem;
         }
     }
-
-    .position-relative {
-        display: inline-block;
-    }
-
-    .btn-danger i {
-        color: white;
-        font-size: 1.1rem;
-    }
-
-    .btn-danger:hover {
-        background-color: #c62828;
-    }
     </style>
 </head>
 
@@ -172,9 +159,17 @@ if (!isset($_SESSION['userrole']) || $_SESSION['userrole'] !== 'admin') {
             <div class="row">
                 <?php
                 $apps = [
-                    ["name" => "ธ.กรุงเทพ", "info" => "8777489249\nธนาวดี ติธาดา"],
-                    ["name" => "ธ.กสิกร", "info" => "0651842921\nธนาวดี ติธาดา"],
-                    ["name" => "ธ.ไทยพาณิชย์", "info" => "4111065175\nธนาวดี ติธาดา"],
+                    ["name" => "🌸หาร Youtube Premium🌸", "info" => "เดือนละ 79฿\n\n#หารยูทูปพรีเมี่ยม #หารYouTubePremium #หารYouTube
+#หารยูทูปพรีเมี่ยมราคาถูก"],
+                    ["name" => "หาร Disney+ จอไม่ชน🌻", "info" => "🌸จอละ 85฿ / 30 วัน\n🌸จอละ 30฿ / 7วัน\n🌸จอละ 10฿ / วัน\n\n#หาdisneyplus #หารdisneyplus #ดิสนีย์พลัส #หารดิสนีย์พลัส #DisneyPlusหาร"],
+                    ["name" => "หาร WE TV🌸", "info" => "🌸 ส่วนตัว 40฿ / 30 วัน\n\n#หารwetv #หารวีทีวี #หาwetv #หาวีทีวี #หารwetvIราคาถูก"],
+                    ["name" => "หาร IQIYI🌸", "info" => "🌸 ส่วนตัว 35฿ / 30 วัน\n\n#หารiQiyi #หารอ้ายฉี้อี้ #หารอ้ายฉีอี้ #หาiqiyi #หารiqiyipremium #หารIQIYIราคาถูก"],                   
+                    ["name" => "หาร VIU🌻", "info" => "🌸 ส่วนตัว 40฿ / 30 วัน\n\n#หาviu #หารviuพรีเมี่ยม #หารviu #หารviuราคาถูก #หารviupremiumราคาถูก"],
+                    ["name" => "หาร NETFLIX🌻", "info" => "จอละ 135฿ / 30 วัน\nจอละ 40฿ / 7วัน\nจอละ 15฿ / วัน\n\n#หาnetflix #หารเน็ตฟลิกซ์ #หารเน็ตฟลิกซ์ราคาถูก #หารnetflix"],
+                    ["name" => "หาร PRIME VIDEO", "info" => "จอละ 59฿ / 30 วัน"],
+                    ["name" => "หาร HBO", "info" => "จอละ 80฿ / 30 วัน\nจอละ 29฿/7วัน"],  
+                    ["name" => "หาร BUGABOO.TV", "info" => "จอละ 110฿ / 30 วัน\nจอละ 35฿/7วัน\nจอละ 15฿/วัน"],
+                    ["name" => "หาร 3PLUS", "info" => "จอละ 65฿ / 30 วัน\nจอละ 30฿/7วัน\nจอละ 9฿/วัน"],
                 ];
 
                 foreach ($apps as $a) {
@@ -191,19 +186,6 @@ if (!isset($_SESSION['userrole']) || $_SESSION['userrole'] !== 'admin') {
                     </div>';
                 }
                 ?>
-
-                <div class="col-12 my-3 text-center">
-                    <div class="position-relative d-inline-block">
-                        <img src="index/payment.png" alt="รายการ" class="img-fluid header-img">
-
-                        <a href="index/payment.png" download
-                            class="btn btn-danger position-absolute top-0 end-0 m-2 rounded-circle shadow"
-                            title="ดาวน์โหลดรูปภาพ">
-                            <i class="fa-solid fa-download"></i>
-                        </a>
-                    </div>
-                </div>
-
             </div>
         </div>
     </div>

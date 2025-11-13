@@ -1,7 +1,7 @@
 {
   "name": "App Premium",
   "short_name": "App Premium",
-  "start_url": "index.php",
+  "start_url": "menu.php",
   "display": "standalone",
   "background_color": "#96a1cd",
   "theme_color": "#96a1cd",

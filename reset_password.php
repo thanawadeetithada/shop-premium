@@ -37,6 +37,9 @@ if ($result->num_rows === 0) {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="apple-mobile-web-app-title" content="App Premium">
+    <meta name="application-name" content="App Premium">
+    <meta name="theme-color" content="#96a1cd">
     <title>เปลี่ยนรหัสผ่าน</title>
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
     <style>
@@ -225,4 +228,5 @@ if ($result->num_rows === 0) {
     });
     </script>
 </body>
+
 </html>
