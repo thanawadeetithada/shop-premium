@@ -7,6 +7,8 @@ if (!isset($_SESSION['userrole']) || $_SESSION['userrole'] !== 'admin') {
     exit();
 }
 
+$back_url = $_GET['from'] ?? 'index.php';
+
 $family_id = $_GET['family_id'] ?? 0;
 $app_id = $_GET['app_id'] ?? 0;
 
@@ -180,6 +182,24 @@ $result_members = $stmt_members->get_result();
         color: #888;
         background-color: #f2f2f2;
     }
+
+    @keyframes blink-animation {
+        0% {
+            background-color: #ffcccc;
+        }
+
+        50% {
+            background-color: #ffffff;
+        }
+
+        100% {
+            background-color: #ffcccc;
+        }
+    }
+
+    .blink-red td {
+        animation: blink-animation 3s infinite;
+    }
     </style>
 </head>
 
@@ -221,7 +241,7 @@ $result_members = $stmt_members->get_result();
         </div>
     </div>
     <div class="text-start mb-3">
-        <a href="#" class="btn" onclick="window.history.back(); return false;">
+        <a href="<?= htmlspecialchars($back_url) ?>" class="btn">
             <i class="fa-solid fa-arrow-left"></i> กลับ
         </a>
 
@@ -311,9 +331,10 @@ echo "</td>
     echo "</td>
         <td>$note</td>
         <td>
-            <a href='edit_family.php?family_id=" . $family['family_id'] . "&app_id=" . $app_id . "' class='btn btn-warning btn-sm'>
-                <i class='fa-solid fa-pencil'></i>
-            </a>
+             <a href='edit_family.php?family_id=" . $family['family_id'] . "&app_id=" . $app_id . "&from=" . $back_url . "' 
+       class='btn btn-warning btn-sm'>
+        <i class='fa-solid fa-pencil'></i>
+    </a>
             &nbsp;
             <button class='btn btn-danger btn-sm'
                 data-bs-toggle='modal'
@@ -347,7 +368,7 @@ echo "</td>
                     </button>
                 </div>
                 <div class="tab-func">
-                    <input type="text" class="form-control search-name" placeholder="ค้นหาด้วยชื่อ">
+                    <input type="text" class="form-control search-name" placeholder="ค้นหา...">
                 </div>
             </div>
         </div>
@@ -378,6 +399,7 @@ echo "</td>
                     <?php
 if ($result_members->num_rows > 0) {
             $no = 1;
+            $today = date("Y-m-d");
     while ($member = $result_members->fetch_assoc()) {
 
         $member_name   = !empty($member['member_name']) ? htmlspecialchars($member['member_name']) : '-';
@@ -388,8 +410,9 @@ if ($result_members->num_rows > 0) {
         $days          = isset($member['days']) && $member['days'] !== '' ? htmlspecialchars($member['days']) : '-';
         $start_date    = (!empty($member['start_date']) && $member['start_date'] !== '0000-00-00')
                             ? date("d/m/Y", strtotime($member['start_date'])) : '-';
-        $expire_date   = (!empty($member['expire_date']) && $member['expire_date'] !== '0000-00-00')
-                            ? date("d/m/Y", strtotime($member['expire_date'])) : '-';
+       $expire_date = (!empty($member['expire_date']) && $member['expire_date'] !== '0000-00-00')
+               ? date("d/m/Y", strtotime($member['expire_date'])) 
+               : '-';
         $pay_day_display = (!empty($family['pay_day']) && $family['pay_day'] !== '0000-00-00')
                             ? date("d/m/Y", strtotime($family['pay_day'])) : '-';
 
@@ -427,9 +450,22 @@ if ($result_members->num_rows > 0) {
         $price_per_day = isset($member['price_per_day']) && $member['price_per_day'] !== ''
             ? htmlspecialchars($member['price_per_day'])
             : '-';
+
+        $expire_date_db = $member['expire_date'];
+        $row_class = '';
+
+        if (!empty($expire_date_db) && $expire_date_db !== '0000-00-00') {
+            $expire_timestamp = strtotime($expire_date_db);
+            $today_timestamp = strtotime($today);
+
+            if (!empty($expire_date_db) && $expire_date_db !== '0000-00-00' && $expire_date_db <= $today) {
+            $row_class = 'blink-red';
+        }
+    }
+
         ?>
 
-                    <tr>
+                    <tr class="<?= $row_class ?>">
                         <td><input type="checkbox" class="row-check"></td>
                         <td><?= $no ?></td>
                         <td><?= $member_name ?></td>
@@ -438,8 +474,10 @@ if ($result_members->num_rows > 0) {
                         <td><?= $screen ?></td>
                         <td><?= $device ?></td>
                         <td><?= $days ?></td>
-                        <td><?= $start_date ?></td>
-                        <td><?= $expire_date ?></td>
+                        <td><?= (!empty($member['start_date']) && $member['start_date'] !== '0000-00-00') ? date("d/m/Y", strtotime($member['start_date'])) : '-' ?>
+                        </td>
+                        <td><?= (!empty($member['expire_date']) && $member['expire_date'] !== '0000-00-00') ? date("d/m/Y", strtotime($member['expire_date'])) : '-' ?>
+                        </td>
                         <td>
                             <?php
                                 if (!empty($member['transfer_time']) && $member['transfer_time'] !== '0000-00-00 00:00:00') {
@@ -455,7 +493,7 @@ if ($result_members->num_rows > 0) {
                         <td><?= $pay_status ?></td>
                         <td><?= $slip_img ?></td>
                         <td>
-                            <a href="edit_member.php?member_id=<?= $member['member_id'] ?>&family_id=<?= $family_id ?>&app_id=<?= $app_id ?>"
+                            <a href="edit_member.php?member_id=<?= $member['member_id'] ?>&family_id=<?= $family_id ?>&app_id=<?= $app_id ?>&from=<?= $back_url ?>"
                                 class="btn btn-warning btn-sm">
                                 <i class="fa-solid fa-pencil"></i>
                             </a>

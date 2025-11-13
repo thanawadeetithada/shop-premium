@@ -283,7 +283,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <button type="button" class="btn-close btn-close-white" data-bs-dismiss="offcanvas"></button>
         </div>
         <div class="offcanvas-body">
-             <ul class="list-unstyled">
+            <ul class="list-unstyled">
                 <li><a href="alert_page.php" class="text-white text-decoration-none d-block py-2"><i
                             class="fa-solid fa-bell"></i> แจ้งเตือนรายการ</a></li>
                 <li><a href="check_list.php" class="text-white text-decoration-none d-block py-2"><i
@@ -406,6 +406,30 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             </div>
         </div>
     </div>
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const startInput = document.querySelector('input[name="start_date"]');
+        const expireInput = document.querySelector('input[name="expire_date"]');
+        const daysInput = document.querySelector('input[name="days"]');
+
+        function calculateDays() {
+            const startDate = new Date(startInput.value);
+            const expireDate = new Date(expireInput.value);
+
+            if (startInput.value && expireInput.value) {
+                const diffTime = expireDate - startDate;
+                const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24))
+                daysInput.value = diffDays > 0 ? diffDays : 0;
+            } else {
+                daysInput.value = '';
+            }
+        }
+
+        startInput.addEventListener('change', calculateDays);
+        expireInput.addEventListener('change', calculateDays);
+    });
+    </script>
+
 </body>
 
 </html>

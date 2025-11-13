@@ -259,7 +259,7 @@ $result = $stmt->get_result();
                     </button>
                 </div>
                 <div class="tab-func">
-                    <input type="text" class="form-control search-name" placeholder="ค้นหาด้วยชื่อ">
+                    <input type="text" class="form-control search-name" placeholder="ค้นหา...">
                 </div>
             </div>
         </div>

@@ -316,7 +316,7 @@ $family_query = $conn->query("SELECT family_id, family_name FROM families WHERE 
             <h3 class="text-left">รายชื่อทั้งหมด</h3>
             <div class="search-add">
                 <div class="tab-func">
-                    <input type="text" class="form-control search-name" placeholder="ค้นหาด้วยชื่อ">
+                    <input type="text" class="form-control search-name" placeholder="ค้นหา...">
                 </div>
                 <select name="app_name" class="form-control">
                     <option value="">-- เลือกแอปพลิเคชัน --</option>
@@ -380,10 +380,12 @@ $family_query = $conn->query("SELECT family_id, family_name FROM families WHERE 
                         <td><?= htmlspecialchars($row['expire_date']) ?></td>
                         <td><?= htmlspecialchars($row['transfer_time']) ?></td>
                         <td class='btn-action'>
-                            <a href="<?= $disabled ? '#' : 'dashboard_family.php?family_id=' . htmlspecialchars($row['family_id']) . '&app_id=' . htmlspecialchars($row['app_id']) ?>"
-                                class="btn btn-warning btn-sm <?= $disabled ? 'disabled' : '' ?>"
+                            <a href="<?= $disabled 
+    ? '#' 
+    : 'dashboard_family.php?family_id=' . htmlspecialchars($row['family_id']) 
+      . '&app_id=' . htmlspecialchars($row['app_id']) 
+      . '&from=all_member.php' ?>" class="btn btn-warning btn-sm <?= $disabled ? 'disabled' : '' ?>"
                                 <?= $disabled ? 'aria-disabled="true" tabindex="-1" title="ข้อมูลนี้ถูกลบแล้ว"' : '' ?>>
-
                                 <i class="fa-solid fa-arrow-right"></i>
                             </a>
                         </td>
@@ -512,7 +514,8 @@ $family_query = $conn->query("SELECT family_id, family_name FROM families WHERE 
                 var matchSearch = nameFilter === "" ||
                     memberName.includes(nameFilter) ||
                     device.includes(nameFilter) ||
-                    screen.includes(nameFilter);
+                    screen.includes(nameFilter) ||
+                    $(this).find("td:eq(4)").text().toLowerCase().includes(nameFilter);
 
                 var matchApp = appFilter === "" || appName.includes(appFilter);
                 var matchFamily = familyFilter === "" || familyName.includes(familyFilter);

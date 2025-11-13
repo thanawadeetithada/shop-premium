@@ -31,6 +31,7 @@ $sql = "
         fm.deleted_at IS NULL 
         AND f.deleted_at IS NULL 
         AND a.deleted_at IS NULL
+        AND fm.status != 'admin'
    ORDER BY 
      fm.expire_date ASC
 
@@ -339,7 +340,7 @@ $family_query = $conn->query("SELECT family_id, family_name FROM families WHERE 
             <h3 class="text-left">แจ้งเตือนรายชื่อหมดอายุ</h3>
             <div class="search-add">
                 <div class="tab-func">
-                    <input type="text" class="form-control search-name" placeholder="ค้นหาด้วยชื่อ">
+                    <input type="text" class="form-control search-name" placeholder="ค้นหา...">
                 </div>
                 <select name="app_name" class="form-control">
                     <option value="">-- เลือกแอปพลิเคชัน --</option>
@@ -392,7 +393,9 @@ if ($result->num_rows > 0):
         $disabled = !empty($row['deleted_at']); 
         $rowClass = !empty($row['deleted_at']) ? 'row-disabled' : '';
         $expireDateObj = new DateTime($row['expire_date']);
-        $blinkClass = ($expireDateObj->format('Y-m-d') === $today->format('Y-m-d')) ? 'blink' : '';
+        $interval = $expireDateObj->diff($today);
+        $diffDays = (int)$interval->format('%r%a'); 
+        $blinkClass = ($diffDays >= 0) ? 'blink' : '';
 ?>
                     <tr class="<?= $rowClass ?> <?= $blinkClass ?>">
                         <td><?= $count++ ?></td>
@@ -567,7 +570,8 @@ if ($result->num_rows > 0):
                 var matchSearch = nameFilter === "" ||
                     memberName.includes(nameFilter) ||
                     device.includes(nameFilter) ||
-                    screen.includes(nameFilter);
+                    screen.includes(nameFilter) ||
+                    $(this).find("td:eq(4)").text().toLowerCase().includes(nameFilter);
 
                 var matchApp = appFilter === "" || appName.includes(appFilter);
                 var matchFamily = familyFilter === "" || familyName.includes(familyFilter);
@@ -593,23 +597,21 @@ if ($result->num_rows > 0):
     });
 
     $('#confirmDeleteBtn').click(function() {
-    if (memberToDelete > 0) {
-        $.post('1delete_member.php', {
-            member_id: memberToDelete
-        }, function(response) {
-            var res = JSON.parse(response);
-            if (res.status === 'success') {
-                // ลบแถวออกจากตารางเลย
-                $("a[data-member-id='" + memberToDelete + "']").closest('tr').remove();
-                $('#confirmDeleteModal').modal('hide');
-                filterTable(); // อัปเดต pagination & filter
-            } else {
-                alert(res.message);
-            }
-        });
-    }
-});
-
+        if (memberToDelete > 0) {
+            $.post('1delete_member.php', {
+                member_id: memberToDelete
+            }, function(response) {
+                var res = JSON.parse(response);
+                if (res.status === 'success') {
+                    $("a[data-member-id='" + memberToDelete + "']").closest('tr').remove();
+                    $('#confirmDeleteModal').modal('hide');
+                    filterTable();
+                } else {
+                    alert(res.message);
+                }
+            });
+        }
+    });
     </script>
 
 </body>

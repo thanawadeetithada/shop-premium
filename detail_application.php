@@ -128,7 +128,7 @@ $result_family = $stmt_family->get_result();
             <button type="button" class="btn-close btn-close-white" data-bs-dismiss="offcanvas"></button>
         </div>
         <div class="offcanvas-body">
-             <ul class="list-unstyled">
+            <ul class="list-unstyled">
                 <li><a href="alert_page.php" class="text-white text-decoration-none d-block py-2"><i
                             class="fa-solid fa-bell"></i> แจ้งเตือนรายการ</a></li>
                 <li><a href="check_list.php" class="text-white text-decoration-none d-block py-2"><i
@@ -169,16 +169,27 @@ $result_family = $stmt_family->get_result();
                 <?php while ($row = $result_family->fetch_assoc()): ?>
                 <?php
                     $family_id = $row['family_id'];
-                    $sql_count = "SELECT COUNT(*) as member_count FROM family_members WHERE family_id = ?";
+                    $sql_count = "SELECT COUNT(*) as member_count FROM family_members WHERE family_id = ? AND deleted_at IS NULL";
                     $stmt_count = $conn->prepare($sql_count);
                     $stmt_count->bind_param("i", $family_id);
                     $stmt_count->execute();
                     $result_count = $stmt_count->get_result();
                     $count_data = $result_count->fetch_assoc();
                     $member_count = $count_data['member_count'];
+
+                $sql_total_people = "SELECT total_people FROM families WHERE family_id = ? AND deleted_at IS NULL";
+                $stmt_total_people = $conn->prepare($sql_total_people);
+                $stmt_total_people->bind_param("i", $family_id);
+                $stmt_total_people->execute();
+                $result_total_people = $stmt_total_people->get_result();
+                $total_people = 0;
+                if($row_total = $result_total_people->fetch_assoc()){
+                    $total_people = $row_total['total_people'];
+                }
+                $stmt_total_people->close();
                     ?>
                 <div class="col-md-3 mb-3">
-                    <a href="dashboard_family.php?family_id=<?php echo $family_id; ?>&app_id=<?php echo $app_id; ?>"
+                    <a href="dashboard_family.php?family_id=<?php echo $family_id; ?>&app_id=<?php echo $app_id; ?>&from=detail_application.php?id=<?php echo $app_id; ?>"
                         style="text-decoration: none;">
                         <div class="card p-3 text-center">
                             <?php if ($row['line_group_img']): ?>
@@ -186,7 +197,8 @@ $result_family = $stmt_family->get_result();
                                 style="max-height:150px;">
                             <?php endif; ?>
                             <h4 style="font-weight: bold;"><?php echo htmlspecialchars($row['family_name']); ?></h4>
-                            <p class="text-start" style="margin-bottom: 8px;">สมาชิก : <?php echo $member_count; ?> คน
+                            <p class="text-start" style="margin-bottom: 8px;">
+                                สมาชิก : <?php echo $member_count; ?> / <?php echo $total_people; ?> คน 
                             </p>
                             <p class="text-start">
                                 ครบกำหนด :

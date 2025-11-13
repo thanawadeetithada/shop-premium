@@ -496,6 +496,29 @@ $stmt_insert->bind_param(
         const modal = new bootstrap.Modal(document.getElementById('slipModal'));
         modal.show();
     }
+
+    document.addEventListener('DOMContentLoaded', function() {
+        const startInput = document.querySelector('input[name="start_date"]');
+        const expireInput = document.querySelector('input[name="expire_date"]');
+        const daysInput = document.querySelector('input[name="days"]');
+
+        function calculateDays() {
+            const startDate = new Date(startInput.value);
+            const expireDate = new Date(expireInput.value);
+
+            if (startInput.value && expireInput.value) {
+                const diffTime = expireDate - startDate;
+                const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24))
+                daysInput.value = diffDays > 0 ? diffDays : 0;
+            } else {
+                daysInput.value = '';
+            }
+        }
+
+        startInput.addEventListener('change', calculateDays);
+        expireInput.addEventListener('change', calculateDays);
+    });
+
     </script>
 </body>
 

@@ -9,6 +9,7 @@ if (!isset($_SESSION['userrole']) || $_SESSION['userrole'] !== 'admin') {
 
 $family_id = $_GET['family_id'] ?? 0;
 $app_id = $_GET['app_id'] ?? 0;
+$back_url = $_GET['from'] ?? 'detail_application.php';
 
 $sql = "SELECT * FROM families WHERE family_id = ? AND deleted_at IS NULL";
 $stmt = $conn->prepare($sql);
@@ -85,7 +86,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if ($stmt->execute()) {
         $_SESSION['modal_message'] = "อัปเดตข้อมูลกลุ่มเรียบร้อยแล้ว";
         $_SESSION['modal_type'] = "success";
-        header("Location: dashboard_family.php?family_id=$family_id&app_id=$app_id");
+        header("Location: dashboard_family.php?family_id=$family_id&app_id=$app_id&from=$back_url");
         exit();
     } else {
         $error = "เกิดข้อผิดพลาดในการอัปเดตข้อมูล";
@@ -280,7 +281,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     <input type="date" name="pay_day" class="form-control"
                         value="<?=htmlspecialchars($family['pay_day'])?>">
                 </div>
-                 <div class="mb-3">
+                <div class="mb-3">
                     <label>รูปแบบการชำระ</label><br>
                     <?php if(!empty($family['payment_img'])): ?>
                     <img src="<?=htmlspecialchars($family['payment_img'])?>" width="100" height="100"><br><br>
@@ -294,7 +295,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 <div class="text-center">
                     <button type="submit" class="btn btn-purple">บันทึก</button>
                     <button type="button" class="btn btn-cancel"
-                        onclick="window.location.href='dashboard_family.php?family_id=<?php echo $family_id; ?>&app_id=<?php echo $app_id; ?>'">
+                        onclick="window.location.href='dashboard_family.php?family_id=<?= $family_id ?>&app_id=<?= $app_id ?>&from=<?= $back_url ?>'">
                         ยกเลิก
                     </button>
                 </div>

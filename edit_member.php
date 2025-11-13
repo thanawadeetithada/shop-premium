@@ -10,6 +10,7 @@ if (!isset($_SESSION['userrole']) || $_SESSION['userrole'] !== 'admin') {
 $member_id = $_GET['member_id'] ?? 0;
 $family_id = $_GET['family_id'] ?? 0;
 $app_id    = $_GET['app_id'] ?? 0;
+$back_url = $_GET['from'] ?? 'detail_application.php';
 
 $sql_family = "SELECT * FROM families WHERE family_id = ?";
 $stmt_family = $conn->prepare($sql_family);
@@ -102,7 +103,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     );
 
     if ($stmt_update->execute()) {
-        header("Location: dashboard_family.php?family_id=$family_id&app_id=$app_id");
+        header("Location: dashboard_family.php?family_id=$family_id&app_id=$app_id&from=$back_url");
         exit();
     } else {
         echo "<div class='alert alert-danger'>เกิดข้อผิดพลาดในการอัปเดตข้อมูล</div>";
@@ -307,7 +308,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             <button type="button" class="btn-close btn-close-white" data-bs-dismiss="offcanvas"></button>
         </div>
         <div class="offcanvas-body">
-             <ul class="list-unstyled">
+            <ul class="list-unstyled">
                 <li><a href="alert_page.php" class="text-white text-decoration-none d-block py-2"><i
                             class="fa-solid fa-bell"></i> แจ้งเตือนรายการ</a></li>
                 <li><a href="check_list.php" class="text-white text-decoration-none d-block py-2"><i
@@ -457,13 +458,14 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                     <div class="mb-3" id="preview-container" style="display:none;">
                         <label class="form-label">พรีวิวรูปใหม่</label><br>
                         <img id="previewSlipImg" style="width:100px; border-radius:8px; border:1px solid #ccc;"
-                         onclick="showSlipModal(this.src)">
+                            onclick="showSlipModal(this.src)">
                     </div>
 
                     <div class="text-center">
                         <button type="submit" class="btn btn-purple">บันทึก</button>
-                        <a href="dashboard_family.php?family_id=<?php echo $family_id; ?>&app_id=<?php echo $app_id; ?>"
+                        <a href="dashboard_family.php?family_id=<?= $family_id ?>&app_id=<?= $app_id ?>&from=<?= $back_url ?>"
                             class="btn btn-cancel">ยกเลิก</a>
+
                     </div>
                 </form>
             </div>
@@ -501,6 +503,28 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         const modal = new bootstrap.Modal(document.getElementById('slipModal'));
         modal.show();
     }
+
+    document.addEventListener('DOMContentLoaded', function() {
+        const startInput = document.querySelector('input[name="start_date"]');
+        const expireInput = document.querySelector('input[name="expire_date"]');
+        const daysInput = document.querySelector('input[name="days"]');
+
+        function calculateDays() {
+            const startDate = new Date(startInput.value);
+            const expireDate = new Date(expireInput.value);
+
+            if (startInput.value && expireInput.value) {
+                const diffTime = expireDate - startDate;
+                const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24))
+                daysInput.value = diffDays > 0 ? diffDays : 0;
+            } else {
+                daysInput.value = '';
+            }
+        }
+
+        startInput.addEventListener('change', calculateDays);
+        expireInput.addEventListener('change', calculateDays);
+    });
     </script>
 </body>
 
