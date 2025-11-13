@@ -7,7 +7,7 @@ if (!isset($_SESSION['userrole']) || $_SESSION['userrole'] !== 'admin') {
     exit();
 }
 
-$back_url = $_GET['from'] ?? 'index.php';
+$back_url = $_GET['from'] ?? 'detail_application.php?id=' . ($_GET['app_id'] ?? 0);
 
 $family_id = $_GET['family_id'] ?? 0;
 $app_id = $_GET['app_id'] ?? 0;
