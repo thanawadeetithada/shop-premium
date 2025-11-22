@@ -7,8 +7,18 @@ if (!isset($_SESSION['userrole']) || $_SESSION['userrole'] !== 'admin') {
     exit();
 }
 
-$sql = "SELECT * FROM applications WHERE deleted_at IS NULL";
+$sql = "
+    SELECT a.*, 
+           COUNT(f.family_id) AS total_groups
+    FROM applications a
+    LEFT JOIN families f 
+           ON a.app_id = f.app_id 
+           AND f.deleted_at IS NULL
+    WHERE a.deleted_at IS NULL
+    GROUP BY a.app_id
+";
 $result = $conn->query($sql);
+
 ?>
 
 <!DOCTYPE html>
@@ -159,7 +169,8 @@ $result = $conn->query($sql);
                     <a href="detail_application.php?id=<?php echo $row['app_id']; ?>" class="text-decoration-none">
                         <div class="card text-center p-4 text-white">
                             <h4 style="font-weight: bold;"><?php echo htmlspecialchars($row['app_name']); ?></h4>
-                            <p style="font-weight: bold;">ราคา <?php echo htmlspecialchars($row['real_price']); ?> ฿</p>
+                            <p style="font-weight: bold;margin-bottom: 0px;">ราคา <?php echo htmlspecialchars($row['real_price']); ?> ฿</p>
+                            <p style="font-weight: bold;">จำนวน <?php echo $row['total_groups']; ?> กลุ่ม</p>
                         </div>
                     </a>
                 </div>

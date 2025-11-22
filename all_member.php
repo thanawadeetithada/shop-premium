@@ -21,7 +21,8 @@ $sql = "
         fm.start_date,
         fm.expire_date,
         fm.transfer_time,
-        fm.deleted_at,       -- ✅ เพิ่มถ้าต้องใช้ตรวจสอบ
+        fm.status,
+        fm.deleted_at,
         f.deleted_at AS family_deleted_at
     FROM family_members fm
     LEFT JOIN families f ON fm.family_id = f.family_id
@@ -48,7 +49,7 @@ $family_query = $conn->query("SELECT family_id, family_name FROM families WHERE 
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="apple-mobile-web-app-title" content="App Premium">
     <meta name="application-name" content="App Premium">
-    <meta name="theme-color" content="#96a1cd">>
+    <meta name="theme-color" content="#96a1cd">
     <title>รายชื่อ</title>
     <link rel="manifest" href="manifest.json">
     <link rel="apple-touch-icon" href="icons/icon-192.png">
@@ -325,7 +326,7 @@ $family_query = $conn->query("SELECT family_id, family_name FROM families WHERE 
                     <input type="text" class="form-control search-name" placeholder="ค้นหา...">
                 </div>
                 <select name="app_name" class="form-control">
-                    <option value="">-- เลือกแอปพลิเคชัน --</option>
+                    <option value="">เลือกแอปพลิเคชัน</option>
                     <?php while ($app = $app_query->fetch_assoc()): ?>
                     <option value="<?= htmlspecialchars($app['app_id']) ?>"
                         data-name="<?= htmlspecialchars(strtolower($app['app_name'])) ?>">
@@ -342,6 +343,11 @@ $family_query = $conn->query("SELECT family_id, family_name FROM families WHERE 
                         <?= htmlspecialchars($family['family_name']) ?>
                     </option>
                     <?php endwhile; ?>
+                </select>
+                <select name="status_filter" class="form-control">
+                    <option value="">-- สถานะทั้งหมด --</option>
+                    <option value="admin">แอดมิน</option>
+                    <option value="user">ผู้ใช้งาน</option>
                 </select>
 
             </div>
@@ -362,6 +368,7 @@ $family_query = $conn->query("SELECT family_id, family_name FROM families WHERE 
                         <th>วันเริ่มต้น</th>
                         <th>วันหมดอายุ</th>
                         <th>วันที่โอน</th>
+                        <th>สถานะ</th>
                         <th>จัดการ</th>
                     </tr>
                 </thead>
@@ -385,13 +392,21 @@ $family_query = $conn->query("SELECT family_id, family_name FROM families WHERE 
                         <td><?= htmlspecialchars($row['start_date']) ?></td>
                         <td><?= htmlspecialchars($row['expire_date']) ?></td>
                         <td><?= htmlspecialchars($row['transfer_time']) ?></td>
+                        <td data-status="<?= htmlspecialchars($row['status']) ?>">
+                            <?= htmlspecialchars($row['status'] === 'admin' ? 'แอดมิน' : 'ผู้ใช้งาน') ?>
+                        </td>
                         <td class='btn-action'>
-                            <a href="<?= $disabled 
-    ? '#' 
-    : 'dashboard_family.php?family_id=' . htmlspecialchars($row['family_id']) 
-      . '&app_id=' . htmlspecialchars($row['app_id']) 
-      . '&from=all_member.php' ?>" class="btn btn-warning btn-sm <?= $disabled ? 'disabled' : '' ?>"
-                                <?= $disabled ? 'aria-disabled="true" tabindex="-1" title="ข้อมูลนี้ถูกลบแล้ว"' : '' ?>>
+                            <a href="<?php 
+        if ($disabled) {
+            echo 'deleted_member.php?family_id=' . htmlspecialchars($row['family_id']) .
+                 '&app_id=' . htmlspecialchars($row['app_id']) .
+                 '&from=all_member.php';
+        } else {
+            echo 'dashboard_family.php?family_id=' . htmlspecialchars($row['family_id']) .
+                 '&app_id=' . htmlspecialchars($row['app_id']) .
+                 '&from=all_member.php';
+        }
+    ?>" class="btn btn-warning btn-sm">
                                 <i class="fa-solid fa-arrow-right"></i>
                             </a>
                         </td>
@@ -417,10 +432,7 @@ $family_query = $conn->query("SELECT family_id, family_name FROM families WHERE 
                 <ul class="pagination pagination-circle" id="pagination"></ul>
             </nav>
         </div>
-
-
     </div>
-
 
     <div class="modal fade" id="alertModal" tabindex="-1" aria-labelledby="alertModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
@@ -508,7 +520,7 @@ $family_query = $conn->query("SELECT family_id, family_name FROM families WHERE 
             var nameFilter = $(".search-name").val().toLowerCase();
             var appFilter = $("select[name='app_name'] option:selected").data("name") || "";
             var familyFilter = $("select[name='family_name'] option:selected").data("name") || "";
-            var visibleRows = 0;
+            var statusFilter = $("select[name='status_filter']").val().toLowerCase();
 
             filteredRows = $tableRows.filter(function() {
                 var memberName = $(this).find("td:eq(1)").text().toLowerCase();
@@ -516,6 +528,7 @@ $family_query = $conn->query("SELECT family_id, family_name FROM families WHERE 
                 var familyName = $(this).find("td:eq(3)").text().toLowerCase();
                 var device = $(this).find("td:eq(5)").text().toLowerCase();
                 var screen = $(this).find("td:eq(6)").text().toLowerCase();
+                var memberStatus = $(this).find("td:eq(11)").data("status");
 
                 var matchSearch = nameFilter === "" ||
                     memberName.includes(nameFilter) ||
@@ -525,13 +538,17 @@ $family_query = $conn->query("SELECT family_id, family_name FROM families WHERE 
 
                 var matchApp = appFilter === "" || appName.includes(appFilter);
                 var matchFamily = familyFilter === "" || familyName.includes(familyFilter);
+                var matchStatus = statusFilter === "" || memberStatus === statusFilter;
 
-                return matchSearch && matchApp && matchFamily;
+                return matchSearch && matchApp && matchFamily && matchStatus;
             });
 
             $("#noResult").toggle(filteredRows.length === 0);
             showPage(1);
         }
+
+        $("select[name='status_filter']").on("change", filterTable);
+
 
         $(".search-name").on("keyup", filterTable);
         $("select[name='app_name'], select[name='family_name']").on("change", filterTable);
