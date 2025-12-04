@@ -308,6 +308,14 @@ while ($row = $result_app_profit_only->fetch_assoc()) {
                 </div>
             </div>
 
+            <div class="row mb-4">
+                <div class="col text-end">
+                    <a href="export_db.php" class="btn btn-success">
+                        <i class="fa-solid fa-download"></i> ดาวน์โหลดข้อมูลทุกตาราง (.sql)
+                    </a>
+                </div>
+            </div>
+
             <div class="row mb-4 d-flex align-items-stretch">
                 <div class="col-md-6">
                     <div class="summary-card h-100">
@@ -345,8 +353,6 @@ while ($row = $result_app_profit_only->fetch_assoc()) {
                     </div>
                 </div>
             </div>
-
-
 
             <div class="card">
                 <div class="card-body">
