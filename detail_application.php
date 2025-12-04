@@ -16,7 +16,15 @@ $stmt_app->execute();
 $result_app = $stmt_app->get_result();
 $app = $result_app->fetch_assoc();
 
-$sql_family = "SELECT * FROM families WHERE app_id = ? AND deleted_at IS NULL";
+$sql_family = "SELECT * FROM families 
+               WHERE app_id = ? AND deleted_at IS NULL 
+               ORDER BY 
+                 CASE 
+                   WHEN pay_day IS NULL OR pay_day = '0000-00-00' THEN 1
+                   ELSE 0 
+                 END,
+                 pay_day ASC";
+
 $stmt_family = $conn->prepare($sql_family);
 $stmt_family->bind_param("i", $app_id);
 $stmt_family->execute();

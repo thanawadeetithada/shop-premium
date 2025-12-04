@@ -402,15 +402,12 @@ while ($row = $result_app_profit_only->fetch_assoc()) {
     const barColors = <?= json_encode($expenseData) ?>.map(() => `hsl(${Math.random()*360}, 70%, 50%)`);
 
     new Chart(ctxExpense, {
-        type: 'bar',
+        type: 'pie',
         data: {
             labels: <?= json_encode($expenseLabels) ?>,
             datasets: [{
-                label: 'รายจ่าย (บาท)',
                 data: <?= json_encode($expenseData) ?>,
                 backgroundColor: barColors,
-                borderColor: barColors,
-                borderWidth: 1,
                 borderRadius: 5
             }]
         },
@@ -427,23 +424,27 @@ while ($row = $result_app_profit_only->fetch_assoc()) {
                 x: {
                     title: {
                         display: true,
-                        text: 'แอป'
                     }
                 }
             },
             plugins: {
-                legend: {
-                    display: false
-                },
-                tooltip: {
-                    callbacks: {
-                        label: function(context) {
-                            return '฿ ' + context.formattedValue;
-                        }
+                datalabels: {
+                    formatter: (value, ctx) => {
+                        let dataArr = ctx.chart.data.datasets[0].data;
+                        let total = dataArr.reduce((a, b) => a + b, 0);
+                        return ((value / total) * 100).toFixed(0) + '%';
+                    },
+                    color: '#fff',
+                    font: {
+                        weight: 'bold'
                     }
+                },
+                legend: {
+                    position: 'bottom'
                 }
             }
-        }
+        },
+        plugins: [ChartDataLabels]
     });
 
     new Chart(ctx, {
@@ -452,11 +453,26 @@ while ($row = $result_app_profit_only->fetch_assoc()) {
             labels: categoryLabels,
             datasets: [{
                 data: categoryCounts,
-                backgroundColor: colors
+                backgroundColor: colors,
+                borderRadius: 5
             }]
         },
         options: {
             responsive: true,
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    title: {
+                        display: true,
+                        text: 'จำนวนเงิน (บาท)'
+                    }
+                },
+                x: {
+                    title: {
+                        display: true,
+                    }
+                }
+            },
             plugins: {
                 datalabels: {
                     formatter: (value, ctx) => {

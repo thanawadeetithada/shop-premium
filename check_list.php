@@ -398,10 +398,13 @@ if ($result->num_rows > 0):
     while ($row = $result->fetch_assoc()): 
         $disabled = !empty($row['deleted_at']); 
         $rowClass = !empty($row['deleted_at']) ? 'row-disabled' : '';
-        $expireDateObj = new DateTime($row['expire_date']);
-        $interval = $expireDateObj->diff($today);
-        $diffDays = (int)$interval->format('%r%a'); 
-        $blinkClass = ($diffDays >= 0) ? 'blink' : '';
+		$expireDateOnly = date('Y-m-d', strtotime($row['expire_date']));
+		$transferTimeOnly = date('H:i:s', strtotime($row['transfer_time']));
+		$combinedDateTime = new DateTime("$expireDateOnly $transferTimeOnly");
+		$now = new DateTime();
+		$todayDate = $now->format('Y-m-d');
+		$expireDateOnly2 = $expireDateOnly;
+		$blinkClass = ($expireDateOnly2 <= $todayDate) ? 'blink' : '';                  
 ?>
                     <tr class="<?= $rowClass ?> <?= $blinkClass ?>">
                         <td><?= $count++ ?></td>

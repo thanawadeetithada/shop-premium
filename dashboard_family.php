@@ -61,7 +61,7 @@ $result_members = $stmt_members->get_result();
     <style>
     body {
         font-family: 'Prompt', sans-serif;
-        height: 100vh;
+        height: auto;
         background: url('bg/sky.png') no-repeat center center/cover;
         margin: 0;
     }
