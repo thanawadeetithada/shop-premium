@@ -413,7 +413,7 @@ if ($result->num_rows > 0):
                         <td><?= htmlspecialchars($row['member_name']) ?></td>
                         <td>
                             <?php if (!empty($row['line_group_img'])): ?>
-                            <img src="uploads/<?= htmlspecialchars($row['line_group_img']) ?>" alt="Group Logo"
+                            <img src="<?= htmlspecialchars($row['line_group_img']) ?>" alt="Group Logo"
                                 style="width: 50px; height: 50px; border-radius: 50%; object-fit: cover; border: 1px solid #ddd;">
                             <?php else: ?>
                             <div
