@@ -254,10 +254,9 @@ $current_month_thai = $thai_months[date("m")];
         </div>
     </div>
     <div class="text-start mb-3">
-        <a href="<?= htmlspecialchars($back_url) ?>" class="btn">
+        <a href="javascript:void(0);" onclick="window.history.back();" class="btn">
             <i class="fa-solid fa-arrow-left"></i> กลับ
         </a>
-
     </div>
     <div class="card">
         <div class="header-card">

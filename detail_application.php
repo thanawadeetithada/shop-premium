@@ -51,9 +51,21 @@ $result_family = $stmt_family->get_result();
     <style>
     body {
         font-family: 'Prompt', sans-serif;
-        height: auto;
-        background: url('bg/sky.png') no-repeat center center/cover;
         margin: 0;
+        min-height: 100vh;
+    }
+
+    body::before {
+        content: "";
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        background: url('bg/sky.png') no-repeat center center;
+        background-size: cover;
+        z-index: -1;
+        will-change: transform;
     }
 
     .card {
@@ -170,7 +182,9 @@ $result_family = $stmt_family->get_result();
             </div>
             <h2 class="text-center mb-4"><?php echo htmlspecialchars($app['app_name']); ?></h2>
             <p class="text-center mb-4">ราคา <?php echo htmlspecialchars($app['real_price']); ?> ฿</p>
-            <div class="d-flex justify-content-between align-items-center mb-3" style="margin-left: 1%; margin-right: 1%;">
+            <div class="d-flex justify-content-between align-items-center mb-3"
+                style="margin-left: 1%; margin-right: 1%;">
+
                 <div class="d-flex gap-2">
                     <a href="edit_app.php?app_id=<?php echo $app_id; ?>" class="btn btn-warning">
                         <i class="fa-solid fa-pen-to-square"></i> แก้ไข
@@ -181,9 +195,13 @@ $result_family = $stmt_family->get_result();
                     </a>
                 </div>
 
-                <a href="add_family.php?app_id=<?php echo $app_id; ?>" class="btn btn-primary">
-                    <i class="fa-solid fa-plus"></i> เพิ่มกลุ่ม
-                </a>
+                <div class="d-flex gap-2 align-items-center">
+                    <input type="text" id="searchInput" class="form-control" style="width: 250px;"
+                        placeholder="ค้นหากลุ่ม...">
+                    <a href="add_family.php?app_id=<?php echo $app_id; ?>" class="btn btn-primary text-nowrap">
+                        <i class="fa-solid fa-plus"></i> เพิ่มกลุ่ม
+                    </a>
+                </div>
             </div>
 
             <div class="row">
@@ -210,7 +228,7 @@ $result_family = $stmt_family->get_result();
                 }
                 $stmt_total_people->close();
                     ?>
-                <div class="col-md-3 mb-3">
+                <div class="col-md-3 mb-3 family-card">
                     <a href="dashboard_family.php?family_id=<?php echo $family_id; ?>&app_id=<?php echo $app_id; ?>&from=detail_application.php?id=<?php echo $app_id; ?>"
                         style="text-decoration: none;">
                         <div class="card p-3 text-center">
@@ -235,6 +253,11 @@ $result_family = $stmt_family->get_result();
                     </a>
                 </div>
                 <?php endwhile; ?>
+                
+                <div class="col-12" id="noResultMsg" style="display: none;">
+                    <p class="text-center text-muted mt-4"><i class="fa-solid fa-circle-info"></i> ไม่พบกลุ่มที่ค้นหา</p>
+                </div>
+
                 <?php else: ?>
                 <p class="text-center text-muted">ยังไม่มีกลุ่มในแอปพลิเคชันนี้</p>
                 <?php endif; ?>
@@ -266,6 +289,7 @@ $result_family = $stmt_family->get_result();
 
     <script>
     document.addEventListener('DOMContentLoaded', function() {
+        // ส่วนของ Modal ลบแอปพลิเคชัน
         var deleteModal = document.getElementById('deleteAppModal');
         deleteModal.addEventListener('show.bs.modal', function(event) {
             var button = event.relatedTarget;
@@ -273,6 +297,38 @@ $result_family = $stmt_family->get_result();
             var confirmBtn = deleteModal.querySelector('#confirmDeleteAppBtn');
             confirmBtn.href = 'delete_app.php?app_id=' + appId;
         });
+
+        // ส่วนของการค้นหากลุ่ม
+        const searchInput = document.getElementById('searchInput');
+        if (searchInput) {
+            searchInput.addEventListener('keyup', function() {
+                const filter = this.value.toLowerCase();
+                const cards = document.querySelectorAll('.family-card');
+                let hasResult = false;
+
+                cards.forEach(function(card) {
+                    // ค้นหาจากชื่อกลุ่ม (แท็ก h4)
+                    const groupName = card.querySelector('h4').textContent.toLowerCase();
+                    
+                    if (groupName.includes(filter)) {
+                        card.style.display = '';
+                        hasResult = true;
+                    } else {
+                        card.style.display = 'none';
+                    }
+                });
+
+                // แสดงข้อความ "ไม่พบกลุ่มที่ค้นหา" หากหาไม่เจอ
+                const noResultMsg = document.getElementById('noResultMsg');
+                if (noResultMsg) {
+                    if (!hasResult && filter.trim() !== '') {
+                        noResultMsg.style.display = 'block';
+                    } else {
+                        noResultMsg.style.display = 'none';
+                    }
+                }
+            });
+        }
     });
     </script>
 </body>
