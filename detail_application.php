@@ -170,11 +170,19 @@ $result_family = $stmt_family->get_result();
             </div>
             <h2 class="text-center mb-4"><?php echo htmlspecialchars($app['app_name']); ?></h2>
             <p class="text-center mb-4">ราคา <?php echo htmlspecialchars($app['real_price']); ?> ฿</p>
-            <div class="text-end mb-3">
-                <a href="edit_app.php?app_id=<?php echo $app_id; ?>" class="btn btn-warning">แก้ไข</a>
-                <a href="#" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#deleteAppModal"
-                    data-app-id="<?php echo $app_id; ?>">
-                    ลบแอปพลิเคชัน
+            <div class="d-flex justify-content-between align-items-center mb-3" style="margin-left: 1%; margin-right: 1%;">
+                <div class="d-flex gap-2">
+                    <a href="edit_app.php?app_id=<?php echo $app_id; ?>" class="btn btn-warning">
+                        <i class="fa-solid fa-pen-to-square"></i> แก้ไข
+                    </a>
+                    <a href="#" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#deleteAppModal"
+                        data-app-id="<?php echo $app_id; ?>">
+                        <i class="fa-solid fa-trash-can"></i> ลบแอปพลิเคชัน
+                    </a>
+                </div>
+
+                <a href="add_family.php?app_id=<?php echo $app_id; ?>" class="btn btn-primary">
+                    <i class="fa-solid fa-plus"></i> เพิ่มกลุ่ม
                 </a>
             </div>
 
@@ -212,7 +220,7 @@ $result_family = $stmt_family->get_result();
                             <?php endif; ?>
                             <h4 style="font-weight: bold;"><?php echo htmlspecialchars($row['family_name']); ?></h4>
                             <p class="text-start" style="margin-bottom: 8px;">
-                                สมาชิก : <?php echo $member_count; ?> / <?php echo $total_people; ?> คน 
+                                สมาชิก : <?php echo $member_count; ?> / <?php echo $total_people; ?> คน
                             </p>
                             <p class="text-start">
                                 ครบกำหนด :
@@ -234,10 +242,6 @@ $result_family = $stmt_family->get_result();
             <?php else: ?>
             <div class="alert alert-danger text-center">ไม่พบแอปพลิเคชัน</div>
             <?php endif; ?>
-
-            <div class="text-end mb-3">
-                <a href="add_family.php?app_id=<?php echo $app_id; ?>" class="btn btn-primary">เพิ่มกลุ่ม</a>
-            </div>
         </div>
     </div>
 
