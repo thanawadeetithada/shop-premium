@@ -76,7 +76,6 @@ $result = $conn->query($sql);
         border-radius: 15px;
         box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
         width: 100%;
-        max-width: 700px;
         margin: 20px;
     }
 
@@ -110,11 +109,123 @@ $result = $conn->query($sql);
     }
 
     .btn-add {
-        width: 20%;
+        width: fit-content;
     }
 
     .text-add {
         text-align: end;
+    }
+
+    /* CSS สำหรับ Modal เหมือนหน้าลืมรหัสผ่าน */
+    .input-email {
+        width: 90%;
+        padding: 8px;
+        margin: 5px auto;
+        border: 1px solid #ccc;
+        border-radius: 8px;
+        font-size: 16px;
+        display: block;
+    }
+
+    .input-email:focus {
+        border-color: #8c99bc;
+        outline: none;
+        box-shadow: 0 0 5px rgba(140, 153, 188, 0.5);
+    }
+
+    .btn-send {
+        display: flex;
+        justify-content: center;
+        gap: 10px;
+    }
+
+    .btn-send button {
+        width: auto;
+        margin: 5px;
+    }
+
+    .btn-custom {
+        background-color: #8c99bc;
+        border: none;
+        transition: 0.3s;
+    }
+
+    .btn-custom:hover {
+        background-color: #6f7ca1;
+    }
+
+    .modal-content {
+        background: rgba(255, 255, 255, 0.97);
+        border-radius: 20px;
+        transition: transform 0.25s ease-in-out;
+        animation: fadeInUp 0.3s ease-in-out;
+    }
+
+    @keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .modal.fade .modal-dialog {
+        transform: translateY(-30px);
+        transition: transform 0.3s ease-out;
+    }
+
+    .modal.show .modal-dialog {
+        transform: translateY(0);
+    }
+
+    .text-muted {
+        color: #333 !important;
+    }
+
+    /* CSS สำหรับ Loading Overlay */
+    #loadingOverlay {
+        position: fixed;
+        inset: 0;
+        z-index: 2000;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+
+    #loadingOverlay .overlay-bg {
+        position: absolute;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.6);
+    }
+
+    #loadingOverlay .overlay-spinner {
+        position: relative;
+        text-align: center;
+    }
+
+    /* เพิ่มต่อท้ายในแท็ก <style> เดิมของคุณ */
+    .blink-btn {
+        animation: blink-animation 1.5s steps(5, start) infinite;
+        -webkit-animation: blink-animation 1.5s steps(5, start) infinite;
+        background-color: #0d6efd;
+        border-color: #0d6efd;
+        box-shadow: 0 0 10px rgba(13, 110, 253, 0.8);
+    }
+
+    @keyframes blink-animation {
+        to {
+            visibility: hidden;
+        }
+    }
+
+    @-webkit-keyframes blink-animation {
+        to {
+            visibility: hidden;
+        }
     }
     </style>
 </head>
@@ -151,37 +262,194 @@ $result = $conn->query($sql);
                             class="fa-solid fa-money-bill-wave"></i> ชำระเงิน</a></li>
                 <li><a href="all_member.php" class="text-white text-decoration-none d-block py-2"><i
                             class="fa-solid fa-user"></i> รายชื่อทั้งหมด</a></li>
+                <li><a href="planner.php" class="text-white text-decoration-none d-block py-2"><i
+                            class="fa-solid fa-user"></i> Planner</a></li>
                 <li><a href="user_management.php" class="text-white text-decoration-none d-block py-2"><i
                             class="fa-solid fa-user-tie"></i> ข้อมูลผู้ใช้งาน</a></li>
             </ul>
         </div>
     </div>
+
     <div class="container-wrapper">
         <div class="container">
             <h2>แอปพลิเคชัน</h2>
-            <div class="text-add mb-3">
-                <a href="add_applications.php" class="btn btn-warning btn-add">เพิ่ม</a>
+
+            <div class="row mb-4">
+                <div class="col-6 d-flex justify-content-start align-items-center gap-2">
+                    <?php 
+                        $today = date('d'); // ดึงวันที่ปัจจุบัน (01-31)
+                        $blinkClass = ($today == '05' || $today == '15') ? 'blink-btn' : '';
+                    ?>
+                    <a class="btn btn-primary <?php echo $blinkClass; ?>" data-bs-toggle="modal"
+                        data-bs-target="#sendtoEmailModal">
+                        Send SQL to Email
+                    </a>
+                </div>
+                <div class="col-6 d-flex justify-content-end align-items-center gap-2">
+                    <input type="text" id="searchInput" class="form-control" style="max-width: 300px;"
+                        placeholder="ค้นหาแอปพลิเคชัน...">
+                    <a href="add_applications.php" class="btn btn-warning btn-add px-4 mb-0">เพิ่ม</a>
+                </div>
             </div>
-            <div class="row">
+
+            <div class="row" id="appContainer">
                 <?php if ($result->num_rows > 0): ?>
                 <?php while ($row = $result->fetch_assoc()): ?>
-                <div class="col-md-6 mb-3">
+                <div class="col-lg-3 col-md-4 col-sm-6 mb-3 app-card">
                     <a href="detail_application.php?id=<?php echo $row['app_id']; ?>" class="text-decoration-none">
-                        <div class="card text-center p-4 text-white">
-                            <h4 style="font-weight: bold;"><?php echo htmlspecialchars($row['app_name']); ?></h4>
-                            <p style="font-weight: bold;margin-bottom: 0px;">ราคา <?php echo htmlspecialchars($row['real_price']); ?> ฿</p>
+                        <div class="card text-center p-4 text-white m-0">
+                            <h4 class="app-name" style="font-weight: bold;">
+                                <?php echo htmlspecialchars($row['app_name']); ?></h4>
+                            <p style="font-weight: bold;margin-bottom: 0px;">ราคา
+                                <?php echo htmlspecialchars($row['real_price']); ?> ฿</p>
                             <p style="font-weight: bold;">จำนวน <?php echo $row['total_groups']; ?> กลุ่ม</p>
                         </div>
                     </a>
                 </div>
                 <?php endwhile; ?>
                 <?php else: ?>
-                <p class="text-center text-muted">ยังไม่มีแอปพลิเคชันในระบบ</p>
+                <div class="col-12">
+                    <p class="text-center text-muted">ยังไม่มีแอปพลิเคชันในระบบ</p>
+                </div>
                 <?php endif; ?>
+                <div class="col-12" id="noResultMessage" style="display: none;">
+                    <p class="text-center text-muted mt-3">ไม่พบแอปพลิเคชันที่ค้นหา</p>
+                </div>
             </div>
         </div>
     </div>
 
+    <div class="modal fade" id="sendtoEmailModal" tabindex="-1" role="dialog">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content shadow-lg border-0">
+                <div class="modal-header justify-content-center border-0 pt-4">
+                    <h5 class="modal-title font-weight-bold" style="font-weight: bold;">ส่งไฟล์ Backup ไปยัง Email</h5>
+                </div>
+                <div class="modal-body text-center px-4 pb-4 pt-2">
+                    <p class="text-muted mb-3">
+                        กรุณากรอกอีเมลที่คุณต้องการจะส่งข้อมูลไป<br>(ระบบจะส่งไปยังอีเมลหลักอัตโนมัติด้วย)</p>
+
+                    <form id="sendtoEmailForm">
+                        <input type="email" id="forgotEmail" name="email" class="input-email"
+                            placeholder="กรุณาใส่อีเมลของคุณ" autocomplete="off">
+
+                        <div class="btn-send pt-2">
+                            <button type="submit" id="sendLinkBtn" class="btn btn-custom text-white px-4 py-2"
+                                style="font-weight: bold;">ส่งไฟล์ SQL</button>
+
+                            <button type="button" class="btn btn-outline-secondary px-4 py-2" style="font-weight: bold;"
+                                data-bs-dismiss="modal">ยกเลิก</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="messageModal" tabindex="-1" role="dialog">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content shadow-lg border-0">
+                <div class="modal-header justify-content-center border-0 pt-4">
+                    <h5 class="modal-title font-weight-bold" id="messageModalTitle" style="font-weight: bold;">
+                        แจ้งเตือน
+                    </h5>
+                </div>
+                <div class="modal-body text-center px-4 pb-4 pt-2">
+                    <p class="text-muted mb-3" id="messageModalText"></p>
+                    <div class="btn-send pt-2">
+                        <button type="button" id="messageModalBtn" class="btn px-4 py-2 text-white"
+                            style="font-weight: bold;" data-bs-dismiss="modal">
+                            ตกลง
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="loadingOverlay" class="d-none">
+        <div class="overlay-bg"></div>
+        <div class="overlay-spinner">
+            <div class="spinner-border text-light" role="status" style="width: 4rem; height: 4rem;">
+            </div>
+            <div class="text-light mt-3 fs-5">กำลังส่งอีเมล...</div>
+        </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+    $(document).ready(function() {
+        $("#searchInput").on("keyup", function() {
+            var value = $(this).val().toLowerCase();
+            var hasVisibleCards = false;
+
+            $(".app-card").each(function() {
+                var appName = $(this).find(".app-name").text().toLowerCase();
+                if (appName.indexOf(value) > -1) {
+                    $(this).show();
+                    hasVisibleCards = true;
+                } else {
+                    $(this).hide();
+                }
+            });
+
+            if (!hasVisibleCards && value !== "") {
+                $("#noResultMessage").show();
+            } else {
+                $("#noResultMessage").hide();
+            }
+        });
+
+        $('#forgotEmail').keypress(function(e) {
+            if (e.which === 13) {
+                e.preventDefault();
+                $('#sendLinkBtn').click();
+            }
+        });
+
+        $('#sendtoEmailForm').on('submit', function(e) {
+            e.preventDefault();
+            const email = $('#forgotEmail').val().trim();
+
+            $('#loadingOverlay').removeClass('d-none');
+
+            $.ajax({
+                url: 'backup_mail.php',
+                type: 'POST',
+                data: {
+                    email: email
+                },
+                dataType: 'json',
+                success: function(res) {
+                    $('#sendtoEmailModal').modal('hide');
+                    $('#forgotEmail').val('');
+                    showMessageModal(res.status, res.message);
+                },
+                error: function() {
+                    showMessageModal('danger', 'เกิดข้อผิดพลาดในการเชื่อมต่อเซิร์ฟเวอร์!');
+                },
+                complete: function() {
+                    $('#loadingOverlay').addClass('d-none');
+                }
+            });
+        });
+
+        $('#sendtoEmailModal').on('hidden.bs.modal', function() {
+            $('#forgotEmail').val('');
+        });
+
+        function showMessageModal(type, message) {
+            const title = (type === 'success') ? '✅ สำเร็จ' : '⚠️ แจ้งเตือน';
+            const btnColor = (type === 'success') ? '#28a745' : '#dc3545';
+
+            $('#messageModalTitle').text(title);
+            $('#messageModalText').text(message);
+            $('#messageModalBtn').css('background-color', btnColor);
+
+            $('#messageModal').modal('show');
+        }
+    });
+    </script>
 </body>
 
 </html>

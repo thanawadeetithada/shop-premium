@@ -45,15 +45,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $line_qr_img = $target_file;
     }
 
-    $payment_img = '';
-        if (isset($_FILES['payment_img']) && $_FILES['payment_img']['error'] === UPLOAD_ERR_OK) {
-        $upload_dir = 'uploads/group/';
-        if (!is_dir($upload_dir)) mkdir($upload_dir, 0777, true);
-        $filename = time() . '_' . basename($_FILES['payment_img']['name']);
-        $target_file = $upload_dir . $filename;
-        move_uploaded_file($_FILES['payment_img']['tmp_name'], $target_file);
-        $payment_img = $target_file;
-    }
+    $payment_img = trim($_POST['payment_info'] ?? '');
 
     $sql = "INSERT INTO families 
     (app_id, family_name, password_group, line_group_img, line_qr_img, line_group_link, pay_day, note, total_people, payment_img)
@@ -264,8 +256,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     <input type="date" name="pay_day" class="form-control">
                 </div>
                 <div class="mb-3">
-                    <label>รูปแบบการชำระ</label>
-                    <input type="file" name="payment_img" class="form-control">
+                    <label>รูปแบบการชำระ (เลขบัตร)</label>
+                    <input type="text" name="payment_info" class="form-control" placeholder="กรอกเลขบัตร หรือข้อมูลการชำระเงิน">
                 </div>
                 <div class="mb-3">
                     <label>หมายเหตุ</label>

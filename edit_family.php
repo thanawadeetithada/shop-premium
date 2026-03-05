@@ -33,7 +33,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $upload_dir = 'uploads/';
     $line_group_img = $family['line_group_img'];
     $line_qr_img = $family['line_qr_img'];
-    $payment_img = $family['payment_img'];
+    
+    $payment_img = $_POST['payment_info'] ?? $family['payment_img'];
 
     if (!empty($_FILES['line_group_img']['name'])) {
         $file_tmp = $_FILES['line_group_img']['tmp_name'];
@@ -47,13 +48,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $file_name = uniqid().'_'.basename($_FILES['line_qr_img']['name']);
         move_uploaded_file($file_tmp, $upload_dir.$file_name);
         $line_qr_img = $upload_dir.$file_name;
-    }
-
-    if (!empty($_FILES['payment_img']['name'])) {
-        $file_tmp = $_FILES['payment_img']['tmp_name'];
-        $file_name = uniqid().'_'.basename($_FILES['payment_img']['name']);
-        move_uploaded_file($file_tmp, $upload_dir.$file_name);
-        $payment_img = $upload_dir.$file_name;
     }
 
     $update_sql = "UPDATE families SET 
@@ -93,7 +87,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 }
 ?>
-
 
 <!DOCTYPE html>
 <html lang="th">
@@ -288,11 +281,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         value="<?=htmlspecialchars($family['pay_day'])?>">
                 </div>
                 <div class="mb-3">
-                    <label>รูปแบบการชำระ</label><br>
-                    <?php if(!empty($family['payment_img'])): ?>
-                    <img src="<?=htmlspecialchars($family['payment_img'])?>" width="100" height="100"><br><br>
-                    <?php endif; ?>
-                    <input type="file" name="payment_img" class="form-control">
+                    <label>รูปแบบการชำระ (เลขบัตร)</label>
+                    <input type="text" name="payment_info" class="form-control" 
+                        value="<?=htmlspecialchars($family['payment_img'])?>"
+                        placeholder="กรอกเลขบัตรใหม่">
                 </div>
                 <div class="mb-3">
                     <label>หมายเหตุ</label>

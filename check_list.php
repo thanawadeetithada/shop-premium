@@ -15,6 +15,7 @@ $sql = "
         a.app_id,
         f.family_name,
         f.family_id,
+        f.line_group_img,
         fm.email,
         fm.device,
         fm.screen,
@@ -377,6 +378,7 @@ $family_query = $conn->query("SELECT family_id, family_name FROM families WHERE 
                     <tr>
                         <th>ลำดับ</th>
                         <th>ชื่อ</th>
+                        <th>รูปกลุ่ม</th>
                         <th>แอปพลิเคชัน</th>
                         <th>ชื่อกลุ่ม</th>
                         <th>Email</th>
@@ -409,6 +411,17 @@ if ($result->num_rows > 0):
                     <tr class="<?= $rowClass ?> <?= $blinkClass ?>">
                         <td><?= $count++ ?></td>
                         <td><?= htmlspecialchars($row['member_name']) ?></td>
+                        <td>
+                            <?php if (!empty($row['line_group_img'])): ?>
+                            <img src="uploads/<?= htmlspecialchars($row['line_group_img']) ?>" alt="Group Logo"
+                                style="width: 50px; height: 50px; border-radius: 50%; object-fit: cover; border: 1px solid #ddd;">
+                            <?php else: ?>
+                            <div
+                                style="width: 50px; height: 50px; border-radius: 50%; background: #eee; display: inline-flex; align-items: center; justify-content: center; font-size: 10px; color: #999;">
+                                ไม่มีรูป
+                            </div>
+                            <?php endif; ?>
+                        </td>
                         <td><?= htmlspecialchars($row['app_name']) ?></td>
                         <td><?= htmlspecialchars($row['family_name']) ?></td>
                         <td><?= htmlspecialchars($row['email']) ?></td>
@@ -419,7 +432,7 @@ if ($result->num_rows > 0):
                         <td><?= htmlspecialchars($row['expire_date']) ?></td>
                         <td><?= htmlspecialchars($row['transfer_time']) ?></td>
                         <td class='btn-action'>
-                            <a href="copy_member.php?member_id=<?= $row['member_id'] ?>&family_id=<?= $row['family_id'] ?>&app_id=<?= $row['app_id'] ?>"
+                            <a href="dashboard_family.php?family_id=<?= $row['family_id'] ?>&app_id=<?= $row['app_id'] ?>&from=detail_application.php?id=<?= $row['app_id'] ?>"
                                 class="btn btn-warning btn-sm">
                                 <i class="fa-solid fa-file-import"></i>
                             </a>
@@ -438,7 +451,7 @@ if ($result->num_rows > 0):
 
                     <?php else: ?>
                     <tr>
-                        <td colspan="12" class="text-center text-muted">ไม่มีข้อมูล</td>
+                        <td colspan="13" class="text-center text-muted">ไม่มีข้อมูล</td>
                     </tr>
                     <?php endif; ?>
                 </tbody>
@@ -570,17 +583,20 @@ if ($result->num_rows > 0):
             var visibleRows = 0;
 
             filteredRows = $tableRows.filter(function() {
-                var memberName = $(this).find("td:eq(1)").text().toLowerCase();
-                var appName = $(this).find("td:eq(2)").text().toLowerCase();
-                var familyName = $(this).find("td:eq(3)").text().toLowerCase();
-                var device = $(this).find("td:eq(5)").text().toLowerCase();
-                var screen = $(this).find("td:eq(6)").text().toLowerCase();
+                // --- ส่วนที่ต้องเปลี่ยนตัวเลข Index ---
+                var memberName = $(this).find("td:eq(1)").text()
+                    .toLowerCase(); // คงเดิม เพราะอยู่ก่อนรูป
+                var appName = $(this).find("td:eq(3)").text().toLowerCase(); // เปลี่ยนจาก 2 เป็น 3
+                var familyName = $(this).find("td:eq(4)").text().toLowerCase(); // เปลี่ยนจาก 3 เป็น 4
+                var email = $(this).find("td:eq(5)").text().toLowerCase(); // เปลี่ยนจาก 4 เป็น 5
+                var device = $(this).find("td:eq(6)").text().toLowerCase(); // เปลี่ยนจาก 5 เป็น 6
+                var screen = $(this).find("td:eq(7)").text().toLowerCase(); // เปลี่ยนจาก 6 เป็น 7
 
                 var matchSearch = nameFilter === "" ||
                     memberName.includes(nameFilter) ||
                     device.includes(nameFilter) ||
                     screen.includes(nameFilter) ||
-                    $(this).find("td:eq(4)").text().toLowerCase().includes(nameFilter);
+                    email.includes(nameFilter); // ใช้ตัวแปร email ที่ดึงมาใหม่
 
                 var matchApp = appFilter === "" || appName.includes(appFilter);
                 var matchFamily = familyFilter === "" || familyName.includes(familyFilter);

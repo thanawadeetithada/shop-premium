@@ -48,14 +48,6 @@ if (!$member) {
 // เมื่อกด submit form
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
-    // ทำ soft delete ให้ member เดิม
-    $deleted_at = date('Y-m-d H:i:s');
-    $sql_delete = "UPDATE family_members SET deleted_at = ? WHERE member_id = ?";
-    $stmt_delete = $conn->prepare($sql_delete);
-    $stmt_delete->bind_param("si", $deleted_at, $member_id);
-    $stmt_delete->execute();
-
-    // เตรียมข้อมูลสำหรับ insert ใหม่
     $member_name   = $_POST['member_name'];
     $email         = $_POST['email'];
     $device        = $_POST['device'];
@@ -69,7 +61,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $expire_date   = !empty($_POST['expire_date']) ? $_POST['expire_date'] : null;
     $transfer_time = !empty($_POST['transfer_time']) ? $_POST['transfer_time'] : null;
 
-    // slip
     $slip_img = $member['slip_img'];
     if (!empty($_FILES['slip_img']['name'])) {
         $target_dir = "uploads/slips/";
@@ -83,39 +74,53 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         }
     }
 
-   $sql_insert = "INSERT INTO family_members 
-(member_name, email, device, source, screen, start_date, days, expire_date, price_per_day, status, pay_status, slip_img, transfer_time, family_id) 
-VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
-$stmt_insert = $conn->prepare($sql_insert); // ต้องมีบรรทัดนี้
-if (!$stmt_insert) {
-    die("Prepare failed: " . $conn->error);
-}
+    $sql_update = "UPDATE family_members SET 
+                    member_name = ?, 
+                    email = ?, 
+                    device = ?, 
+                    source = ?, 
+                    screen = ?, 
+                    start_date = ?, 
+                    days = ?, 
+                    expire_date = ?, 
+                    price_per_day = ?, 
+                    status = ?, 
+                    pay_status = ?, 
+                    slip_img = ?, 
+                    transfer_time = ?, 
+                    family_id = ? 
+                   WHERE member_id = ?";
 
-$stmt_insert->bind_param(
-    "ssssssisdssssi",
-    $member_name,
-    $email, 
-    $device,
-    $source,
-    $screen,
-    $start_date,
-    $days,
-    $expire_date,
-    $price_per_day,
-    $status,
-    $pay_status,
-    $slip_img,  
-    $transfer_time,
-    $family_id 
-);
+    $stmt_update = $conn->prepare($sql_update);
+    if (!$stmt_update) {
+        die("Prepare failed: " . $conn->error);
+    }
 
+    $stmt_update->bind_param(
+        "ssssssisdssssii",
+        $member_name,
+        $email, 
+        $device,
+        $source,
+        $screen,
+        $start_date,
+        $days,
+        $expire_date,
+        $price_per_day,
+        $status,
+        $pay_status,
+        $slip_img,  
+        $transfer_time,
+        $family_id,
+        $member_id
+    );
 
-    if ($stmt_insert->execute()) {
+    if ($stmt_update->execute()) {
         header("Location: check_list.php");
         exit();
     } else {
-        echo "<div class='alert alert-danger'>เกิดข้อผิดพลาดในการสร้างสมาชิกใหม่</div>";
+        echo "<div class='alert alert-danger'>เกิดข้อผิดพลาดในการอัปเดตข้อมูล</div>";
     }
 }
 ?>
@@ -129,7 +134,7 @@ $stmt_insert->bind_param(
     <meta name="apple-mobile-web-app-title" content="App Premium">
     <meta name="application-name" content="App Premium">
     <meta name="theme-color" content="#96a1cd">
-    <title>เปลี่ยนวันหมดอายุ</title>
+    <title>เปลี่ยนวันหมดอายุ ไม่ได้ใช้</title>
     <link rel="manifest" href="manifest.json">
     <link rel="apple-touch-icon" href="icons/icon-192.png">
     <link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png">
@@ -524,7 +529,6 @@ $stmt_insert->bind_param(
         startInput.addEventListener('change', calculateDays);
         expireInput.addEventListener('change', calculateDays);
     });
-
     </script>
 </body>
 

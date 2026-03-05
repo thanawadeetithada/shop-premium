@@ -40,6 +40,13 @@ $stmt_members = $conn->prepare($sql_members);
 $stmt_members->bind_param("i", $family_id);
 $stmt_members->execute();
 $result_members = $stmt_members->get_result();
+
+$thai_months = [
+    "01" => "มกราคม", "02" => "กุมภาพันธ์", "03" => "มีนาคม", "04" => "เมษายน",
+    "05" => "พฤษภาคม", "06" => "มิถุนายน", "07" => "กรกฎาคม", "08" => "สิงหาคม",
+    "09" => "กันยายน", "10" => "ตุลาคม", "11" => "พฤศจิกายน", "12" => "ธันวาคม"
+];
+$current_month_thai = $thai_months[date("m")];
 ?>
 <!DOCTYPE html>
 <html lang="th">
@@ -80,7 +87,7 @@ $result_members = $stmt_members->get_result();
     .table td {
         text-align: center;
         font-size: 14px;
-
+        vertical-align: middle;
     }
 
     .table {
@@ -327,20 +334,34 @@ echo "</td>
         <td>$real_price</td>
         <td>";
     if (!empty($family['payment_img'])) {
-        echo "<img src='" . htmlspecialchars($family['payment_img']) . "' 
-            width='100' height='100' 
-            style='border-radius:5px; cursor:pointer;' 
-            onclick=\"showSlipModal('" . htmlspecialchars($family['payment_img']) . "')\">";
+        $raw_payment = $family['payment_img'];
+        $len = mb_strlen($raw_payment, 'UTF-8');
+        
+        echo "<span class='payment-mask'>";
+        if ($len > 3) {
+            echo 'XXXXXX' . htmlspecialchars(mb_substr($raw_payment, -3, 3, 'UTF-8'));
+        } elseif ($len > 0) {
+            echo htmlspecialchars($raw_payment);
+        } else {
+            echo "-";
+        }
+        echo "</span>";
     } else {
         echo "-";
     }
     echo "</td>
         <td>$note</td>
         <td>
-             <a href='edit_family.php?family_id=" . $family['family_id'] . "&app_id=" . $app_id . "&from=" . $back_url . "' 
-       class='btn btn-warning btn-sm'>
-        <i class='fa-solid fa-pencil'></i>
-    </a>
+            <a href='edit_family.php?family_id=" . $family['family_id'] . "&app_id=" . $app_id . "&from=" . $back_url . "' 
+                class='btn btn-warning btn-sm'>
+                <i class='fa-solid fa-pencil'></i>
+            </a>
+            &nbsp;
+            <button class='btn btn-primary btn-sm'
+                data-bs-toggle='modal'
+                data-bs-target='#addMonthFamilyModal'>
+                <i class='fa-regular fa-calendar-check'></i>
+            </button>
             &nbsp;
             <button class='btn btn-danger btn-sm'
                 data-bs-toggle='modal'
@@ -419,7 +440,7 @@ if ($result_members->num_rows > 0) {
        $expire_date = (!empty($member['expire_date']) && $member['expire_date'] !== '0000-00-00')
                ? date("d/m/Y", strtotime($member['expire_date'])) 
                : '-';
-        $pay_day_display = (!empty($family['pay_day']) && $family['pay_day'] !== '0000-00-00')
+        $pay_day_display_member = (!empty($family['pay_day']) && $family['pay_day'] !== '0000-00-00')
                             ? date("d/m/Y", strtotime($family['pay_day'])) : '-';
 
         if (!empty($member['status'])) {
@@ -504,6 +525,11 @@ if ($result_members->num_rows > 0) {
                                 <i class="fa-solid fa-pencil"></i>
                             </a>
                             &nbsp;
+                            <button class="btn btn-primary btn-sm" data-bs-toggle="modal"
+                                data-bs-target="#addMonthModal<?= $member['member_id'] ?>">
+                                <i class="fa-regular fa-calendar-check"></i>
+                            </button>
+                            &nbsp;
                             <button class="btn btn-danger btn-sm" data-bs-toggle="modal"
                                 data-bs-target="#deleteModal<?= $member['member_id'] ?>">
                                 <i class="fa-regular fa-trash-can"></i>
@@ -536,6 +562,72 @@ if ($result_members->num_rows > 0) {
                             </div>
                         </div>
                     </div>
+
+                    <?php
+                        // ดึงวันที่ (Day) จาก pay_day ของกลุ่ม (ถ้าไม่มีกลุ่มให้ใช้วันที่ปัจจุบันแทน)
+                        $pay_day_num = (!empty($family['pay_day']) && $family['pay_day'] !== '0000-00-00') 
+                                        ? date('d', strtotime($family['pay_day'])) 
+                                        : date('d');
+
+                        $curr_y = date('Y');
+                        $curr_m = date('m');
+                        $max_day_curr = date('t', strtotime("$curr_y-$curr_m-01")); // หาว่าเดือนนี้มีกี่วัน
+                        $actual_start_day = ($pay_day_num > $max_day_curr) ? $max_day_curr : $pay_day_num;
+                        $calc_start_date = date("Y-m-d", strtotime("$curr_y-$curr_m-$actual_start_day"));
+                        
+                        $next_m = $curr_m + 1;
+                        $next_y = $curr_y;
+                        if ($next_m > 12) {
+                            $next_m = 1;
+                            $next_y++;
+                        }
+                        $max_day_next = date('t', strtotime("$next_y-$next_m-01"));
+                        $actual_expire_day = ($pay_day_num > $max_day_next) ? $max_day_next : $pay_day_num;
+                        $calc_expire_date = date("Y-m-d", strtotime("$next_y-$next_m-$actual_expire_day"));
+                    ?>
+
+                    <div class="modal fade" id="addMonthModal<?= $member['member_id'] ?>" tabindex="-1">
+                        <div class="modal-dialog modal-dialog-centered">
+                            <div class="modal-content">
+                                <form action="add_month.php" method="POST">
+                                    <input type="hidden" name="member_id" value="<?= $member['member_id'] ?>">
+                                    <input type="hidden" name="family_id" value="<?= $family_id ?>">
+                                    <input type="hidden" name="app_id" value="<?= $app_id ?>">
+
+                                    <div
+                                        class="modal-header bg-primary text-white position-relative flex-column align-items-center py-3">
+                                        <h5 class="modal-title mb-1">จ่ายแล้วเดือนนี้</h5>
+                                        <h6 class="mb-0">เดือน <?= $current_month_thai ?></h6>
+
+                                        <button type="button"
+                                            class="btn-close btn-close-white position-absolute top-0 end-0 m-3"
+                                            data-bs-dismiss="modal"></button>
+                                    </div>
+
+                                    <div class="modal-body text-center py-4">
+                                        <div class="row mb-3 text-start">
+                                            <div class="col-md-6">
+                                                <label class="form-label">วันเริ่ม</label>
+                                                <input type="date" name="start_date" class="form-control"
+                                                    value="<?= $calc_start_date ?>">
+                                            </div>
+                                            <div class="col-md-6">
+                                                <label class="form-label">วันหมดอายุ</label>
+                                                <input type="date" name="expire_date" class="form-control"
+                                                    value="<?= $calc_expire_date ?>">
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="modal-footer justify-content-center">
+                                        <button type="button" class="btn btn-secondary"
+                                            data-bs-dismiss="modal">ยกเลิก</button>
+                                        <button type="submit" class="btn btn-primary">เพิ่มเดือน</button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
                     <?php
                         $no++;
                     }
@@ -545,13 +637,13 @@ if ($result_members->num_rows > 0) {
                 }
                 ?>
                     <tr id="noResult" style="display: <?= $noResultDisplay ?>;">
-                        <td colspan="13" class="text-center text-muted fw-bold bg-light py-3">
+                        <td colspan="16" class="text-center text-muted fw-bold bg-light py-3">
                             <i class="fa-solid fa-circle-info"></i> ไม่พบข้อมูลที่ค้นหา
                         </td>
                     </tr>
                 </tbody>
                 <tr id="noResult" style="display:none;">
-                    <td colspan="13" class="text-center text-muted fw-bold bg-light py-3">
+                    <td colspan="16" class="text-center text-muted fw-bold bg-light py-3">
                         <i class="fa-solid fa-circle-info"></i> ไม่พบข้อมูลที่ค้นหา
                     </td>
                 </tr>
@@ -578,6 +670,59 @@ if ($result_members->num_rows > 0) {
                     <a href="delete_family.php?family_id=<?php echo $family['family_id']; ?>&app_id=<?php echo $app_id; ?>"
                         class="btn btn-danger">ลบข้อมูล</a>
                 </div>
+            </div>
+        </div>
+    </div>
+
+    <?php
+        $current_pay_day = (!empty($family['pay_day']) && $family['pay_day'] !== '0000-00-00') 
+                            ? $family['pay_day'] 
+                            : date("Y-m-d");
+        
+        $y = date('Y', strtotime($current_pay_day));
+        $m = date('m', strtotime($current_pay_day));
+        $d = date('d', strtotime($current_pay_day));
+
+        $m++;
+        if ($m > 12) {
+            $m = 1;
+            $y++;
+        }
+        
+        $max_day = date('t', strtotime("$y-$m-01"));
+        $safe_d = ($d > $max_day) ? $max_day : $d;
+
+        $next_pay_day = date("Y-m-d", strtotime("$y-$m-$safe_d"));
+    ?>
+
+    <div class="modal fade" id="addMonthFamilyModal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <form action="update_family_payday.php" method="POST">
+                    <input type="hidden" name="family_id" value="<?php echo $family['family_id']; ?>">
+                    <input type="hidden" name="app_id" value="<?php echo $app_id; ?>">
+                    
+                    <div class="modal-header bg-primary text-white position-relative flex-column align-items-center py-3">
+                        <h5 class="modal-title mb-1">จ่ายแล้วเดือนนี้</h5>
+                        <h6 class="mb-0">เดือน <?= $current_month_thai ?></h6>
+                        <button type="button" class="btn-close btn-close-white position-absolute top-0 end-0 m-3" data-bs-dismiss="modal"></button>
+                    </div>
+
+                    <div class="modal-body text-center py-4">
+                        <div class="row mb-3 text-start">
+                            <div class="col-md-12">
+                                <label class="form-label">รอบชำระใหม่ (เดือนถัดไป)</label>
+                                <input type="date" name="pay_day" class="form-control" value="<?= $next_pay_day ?>" required>
+                                <small class="text-muted mt-1 d-block">ระบบคำนวณบวกเพิ่มให้ 1 เดือนจากรอบเดิมโดยอัตโนมัติ</small>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="modal-footer justify-content-center">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">ยกเลิก</button>
+                        <button type="submit" class="btn btn-primary">รอบชำระใหม่</button>
+                    </div>
+                </form>
             </div>
         </div>
     </div>

@@ -159,10 +159,11 @@ if (!isset($_SESSION['userrole']) || $_SESSION['userrole'] !== 'admin') {
             <div class="row">
                 <?php
                 $apps = [
-                    ["name" => "🌸หาร Youtube Premium🌸", "info" => "เดือนละ 79฿\n\n#หารยูทูปพรีเมี่ยม #หารYouTubePremium #หารYouTube
+                    ["name" => "🌸หาร Youtube Premium🌸", "info" => "แฟมไทยนะคะ เมลตัวเองค่ะ\n\nเดือนละ 79฿\n\n#หารยูทูปพรีเมี่ยม #หารYouTubePremium #หารYouTube
 #หารยูทูปพรีเมี่ยมราคาถูก"],
-                    ["name" => "หาร Disney+ จอไม่ชน🌻", "info" => "🌸จอละ 85฿ / 30 วัน\n🌸จอละ 30฿ / 7วัน\n🌸จอละ 10฿ / วัน\n\n#หาdisneyplus #หารdisneyplus #ดิสนีย์พลัส #หารดิสนีย์พลัส #DisneyPlusหาร"],
-                    ["name" => "หาร WE TV🌸", "info" => "🌸 40฿ / 30 วัน\n\n#หารwetv #หารวีทีวี #หาwetv #หาวีทีวี #หารwetvIราคาถูก"],
+                    ["name" => "หาร Disney+ จอไม่ชน🌻", "info" => "🌸จอละ 95฿ / 30 วัน\n🌸จอละ 50฿ / 7วัน\n🌸จอละ 20฿ / วัน\n\n#หาdisneyplus #หารdisneyplus #ดิสนีย์พลัส #หารดิสนีย์พลัส #DisneyPlusหาร"],
+                    ["name" => "Gemini pro 2T + ยูทูปพรีเมี่ยม 🌸", "info" => "ไม่ต่อเมล ใช้ส่วนตัวไม่หาร\n\n 100฿ /30 วัน มีเมลให้ค่ะ\n135฿ /30 วัน ใช้เมลตัวเองค่ะ\n\n#หารgoogle #หารgemini #หารเจมีไน #หารgeminipro #หารเจมิไนน์ #หารgoogleone"], 
+                    ["name" => "หาร WE TV🌸", "info" => "🌸 35฿ / 30 วัน\n\n#หารwetv #หารวีทีวี #หาwetv #หาวีทีวี #หารwetvราคาถูก"],
                     ["name" => "หาร IQIYI🌸", "info" => "🌸 35฿ / 30 วัน\n\n#หารiQiyi #หารอ้ายฉี้อี้ #หารอ้ายฉีอี้ #หาiqiyi #หารiqiyipremium #หารIQIYIราคาถูก"],                   
                     ["name" => "หาร VIU🌻", "info" => "🌸 40฿ / 30 วัน\n\n#หาviu #หารviuพรีเมี่ยม #หารviu #หารviuราคาถูก #หารviupremiumราคาถูก"],
                     ["name" => "หาร NETFLIX🌻", "info" => "จอละ 135฿ / 30 วัน\nจอละ 40฿ / 7วัน\nจอละ 15฿ / วัน\n\n#หาnetflix #หารเน็ตฟลิกซ์ #หารเน็ตฟลิกซ์ราคาถูก #หารnetflix"],
