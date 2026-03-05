@@ -72,7 +72,7 @@ $result = $conn->query($sql);
 
     .container {
         background: rgba(255, 255, 255, 0.9);
-        padding: 30px;
+        padding: 60px;
         border-radius: 15px;
         box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
         width: 100%;
@@ -80,7 +80,7 @@ $result = $conn->query($sql);
     }
 
     h2 {
-        margin-bottom: 20px;
+        margin-bottom: 50px;
         color: black;
         text-align: center;
         margin-top: 20px;
@@ -274,7 +274,7 @@ $result = $conn->query($sql);
         <div class="container">
             <h2>แอปพลิเคชัน</h2>
 
-            <div class="row mb-4">
+            <div class="row mb-5">
                 <div class="col-6 d-flex justify-content-start align-items-center gap-2">
                     <?php 
                         $today = date('d'); // ดึงวันที่ปัจจุบัน (01-31)
@@ -295,7 +295,7 @@ $result = $conn->query($sql);
             <div class="row" id="appContainer">
                 <?php if ($result->num_rows > 0): ?>
                 <?php while ($row = $result->fetch_assoc()): ?>
-                <div class="col-lg-3 col-md-4 col-sm-6 mb-3 app-card">
+                <div class="col-lg-4 col-md-6 col-sm-12 mb-4 app-card">
                     <a href="detail_application.php?id=<?php echo $row['app_id']; ?>" class="text-decoration-none">
                         <div class="card text-center p-4 text-white m-0">
                             <h4 class="app-name" style="font-weight: bold;">
