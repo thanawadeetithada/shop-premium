@@ -278,7 +278,7 @@ $result = $conn->query($sql);
                 <div class="col-6 d-flex justify-content-start align-items-center gap-2">
                     <?php 
                         $today = date('d'); // ดึงวันที่ปัจจุบัน (01-31)
-                        $blinkClass = ($today == '05' || $today == '15') ? 'blink-btn' : '';
+                        $blinkClass = ($today == '01' || $today == '15') ? 'blink-btn' : '';
                     ?>
                     <a class="btn btn-primary <?php echo $blinkClass; ?>" data-bs-toggle="modal"
                         data-bs-target="#sendtoEmailModal">
