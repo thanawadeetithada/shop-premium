@@ -96,7 +96,7 @@ $family_query = $conn->query("SELECT family_id, family_name FROM families WHERE 
     .table td {
         text-align: center;
         font-size: 14px;
-
+        vertical-align: middle;
     }
 
     .table {
@@ -125,6 +125,7 @@ $family_query = $conn->query("SELECT family_id, family_name FROM families WHERE 
     .header-card {
         display: flex;
         justify-content: space-between;
+        align-items: center;
         flex-wrap: wrap;
         gap: 15px;
     }
@@ -157,36 +158,6 @@ $family_query = $conn->query("SELECT family_id, family_name FROM families WHERE 
 
     .modal-body {
         padding: 10px 40px;
-    }
-
-    .search-add {
-        display: flex;
-        gap: 15px;
-        align-items: center;
-        width: 50%;
-    }
-
-    .tab-func {
-        width: 100%;
-        display: flex;
-        justify-content: flex-start;
-        align-items: center;
-    }
-
-    @media (max-width: 768px) {
-        .search-add {
-            flex-direction: row;
-            gap: 10px;
-        }
-
-        .search-name {
-            width: 20%;
-            flex: 1;
-        }
-
-        .tab-func button {
-            width: max-content;
-        }
     }
 
     .switch {
@@ -235,7 +206,6 @@ $family_query = $conn->query("SELECT family_id, family_name FROM families WHERE 
     }
 
     .btn-purple {
-        width: 20%;
         background-color: #8c99bc !important;
         color: white !important;
         border: none;
@@ -344,33 +314,40 @@ $family_query = $conn->query("SELECT family_id, family_name FROM families WHERE 
 
     <div class="card">
         <div class="header-card">
-            <h3 class="text-left">แจ้งเตือนรายชื่อหมดอายุ</h3>
-            <div class="search-add">
-                <div class="tab-func">
-                    <input type="text" class="form-control search-name" placeholder="ค้นหา...">
+            <h3 class="text-left mb-0">แจ้งเตือนรายชื่อหมดอายุ</h3>
+            
+            <div class="row g-2 w-100 mt-2 mt-md-0 justify-content-end" style="max-width: 800px;">
+                <div class="col-12 col-md-4">
+                    <input type="text" class="form-control search-name w-100" placeholder="ค้นหา...">
                 </div>
-                <select name="app_name" class="form-control">
-                    <option value="">-- เลือกแอปพลิเคชัน --</option>
-                    <?php while ($app = $app_query->fetch_assoc()): ?>
-                    <option value="<?= htmlspecialchars($app['app_id']) ?>"
-                        data-name="<?= htmlspecialchars(strtolower($app['app_name'])) ?>">
-                        <?= htmlspecialchars($app['app_name']) ?>
-                    </option>
-                    <?php endwhile; ?>
-                </select>
-
-                <select name="family_name" class="form-control">
-                    <option value="">-- เลือกกลุ่ม --</option>
-                    <?php while ($family = $family_query->fetch_assoc()): ?>
-                    <option value="<?= htmlspecialchars($family['family_id']) ?>"
-                        data-name="<?= htmlspecialchars(strtolower($family['family_name'])) ?>">
-                        <?= htmlspecialchars($family['family_name']) ?>
-                    </option>
-                    <?php endwhile; ?>
-                </select>
-
+                <div class="col-12 col-md-4">
+                    <select name="app_name" class="form-control w-100">
+                        <option value="">-- เลือกแอปพลิเคชัน --</option>
+                        <?php 
+                        if(isset($app_query)) $app_query->data_seek(0);
+                        while ($app = $app_query->fetch_assoc()): ?>
+                        <option value="<?= htmlspecialchars($app['app_id']) ?>"
+                            data-name="<?= htmlspecialchars(strtolower($app['app_name'])) ?>">
+                            <?= htmlspecialchars($app['app_name']) ?>
+                        </option>
+                        <?php endwhile; ?>
+                    </select>
+                </div>
+                <div class="col-12 col-md-4">
+                    <select name="family_name" class="form-control w-100">
+                        <option value="">-- เลือกกลุ่ม --</option>
+                        <?php 
+                        if(isset($family_query)) $family_query->data_seek(0);
+                        while ($family = $family_query->fetch_assoc()): ?>
+                        <option value="<?= htmlspecialchars($family['family_id']) ?>"
+                            data-name="<?= htmlspecialchars(strtolower($family['family_name'])) ?>">
+                            <?= htmlspecialchars($family['family_name']) ?>
+                        </option>
+                        <?php endwhile; ?>
+                    </select>
+                </div>
             </div>
-        </div>
+            </div>
         <br>
         <div class="table-responsive">
             <table class="table table-bordered" id="memberTable">
@@ -400,13 +377,13 @@ if ($result->num_rows > 0):
     while ($row = $result->fetch_assoc()): 
         $disabled = !empty($row['deleted_at']); 
         $rowClass = !empty($row['deleted_at']) ? 'row-disabled' : '';
-		$expireDateOnly = date('Y-m-d', strtotime($row['expire_date']));
-		$transferTimeOnly = date('H:i:s', strtotime($row['transfer_time']));
-		$combinedDateTime = new DateTime("$expireDateOnly $transferTimeOnly");
-		$now = new DateTime();
-		$todayDate = $now->format('Y-m-d');
-		$expireDateOnly2 = $expireDateOnly;
-		$blinkClass = ($expireDateOnly2 <= $todayDate) ? 'blink' : '';                  
+        $expireDateOnly = date('Y-m-d', strtotime($row['expire_date']));
+        $transferTimeOnly = date('H:i:s', strtotime($row['transfer_time']));
+        $combinedDateTime = new DateTime("$expireDateOnly $transferTimeOnly");
+        $now = new DateTime();
+        $todayDate = $now->format('Y-m-d');
+        $expireDateOnly2 = $expireDateOnly;
+        $blinkClass = ($expireDateOnly2 <= $todayDate) ? 'blink' : '';                  
 ?>
                     <tr class="<?= $rowClass ?> <?= $blinkClass ?>">
                         <td><?= $count++ ?></td>
@@ -432,18 +409,16 @@ if ($result->num_rows > 0):
                         <td><?= htmlspecialchars($row['expire_date']) ?></td>
                         <td><?= htmlspecialchars($row['transfer_time']) ?></td>
                         <td class='btn-action'>
-                            <a href="dashboard_family.php?family_id=<?= $row['family_id'] ?>&app_id=<?= $row['app_id'] ?>&from=detail_application.php?id=<?= $row['app_id'] ?>"
-                                class="btn btn-warning btn-sm">
-                                <i class="fa-solid fa-file-import"></i>
-                            </a>
-
-                            &nbsp;&nbsp;
-                            <a href='#' class='btn btn-danger btn-sm delete-btn'
-                                data-member-id='<?= $row['member_id'] ?>'>
-                                <i class='fa-regular fa-trash-can'></i>
-                            </a>
-
-
+                            <div class="d-flex justify-content-center align-items-center gap-2 flex-wrap flex-xl-nowrap">
+                                <a href="dashboard_family.php?family_id=<?= $row['family_id'] ?>&app_id=<?= $row['app_id'] ?>&from=detail_application.php?id=<?= $row['app_id'] ?>"
+                                    class="btn btn-warning btn-sm">
+                                    <i class="fa-solid fa-file-import"></i>
+                                </a>
+                                <a href='#' class='btn btn-danger btn-sm delete-btn'
+                                    data-member-id='<?= $row['member_id'] ?>'>
+                                    <i class='fa-regular fa-trash-can'></i>
+                                </a>
+                            </div>
                         </td>
                     </tr>
                     <?php endwhile; ?>
@@ -489,7 +464,6 @@ if ($result->num_rows > 0):
         </div>
     </div>
 
-    <!-- Modal ยืนยันการลบ -->
     <div class="modal fade" id="confirmDeleteModal" tabindex="-1" aria-labelledby="confirmDeleteLabel"
         aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
@@ -583,20 +557,18 @@ if ($result->num_rows > 0):
             var visibleRows = 0;
 
             filteredRows = $tableRows.filter(function() {
-                // --- ส่วนที่ต้องเปลี่ยนตัวเลข Index ---
-                var memberName = $(this).find("td:eq(1)").text()
-                    .toLowerCase(); // คงเดิม เพราะอยู่ก่อนรูป
-                var appName = $(this).find("td:eq(3)").text().toLowerCase(); // เปลี่ยนจาก 2 เป็น 3
-                var familyName = $(this).find("td:eq(4)").text().toLowerCase(); // เปลี่ยนจาก 3 เป็น 4
-                var email = $(this).find("td:eq(5)").text().toLowerCase(); // เปลี่ยนจาก 4 เป็น 5
-                var device = $(this).find("td:eq(6)").text().toLowerCase(); // เปลี่ยนจาก 5 เป็น 6
-                var screen = $(this).find("td:eq(7)").text().toLowerCase(); // เปลี่ยนจาก 6 เป็น 7
+                var memberName = $(this).find("td:eq(1)").text().toLowerCase(); 
+                var appName = $(this).find("td:eq(3)").text().toLowerCase(); 
+                var familyName = $(this).find("td:eq(4)").text().toLowerCase(); 
+                var email = $(this).find("td:eq(5)").text().toLowerCase(); 
+                var device = $(this).find("td:eq(6)").text().toLowerCase(); 
+                var screen = $(this).find("td:eq(7)").text().toLowerCase(); 
 
                 var matchSearch = nameFilter === "" ||
                     memberName.includes(nameFilter) ||
                     device.includes(nameFilter) ||
                     screen.includes(nameFilter) ||
-                    email.includes(nameFilter); // ใช้ตัวแปร email ที่ดึงมาใหม่
+                    email.includes(nameFilter); 
 
                 var matchApp = appFilter === "" || appName.includes(appFilter);
                 var matchFamily = familyFilter === "" || familyName.includes(familyFilter);
@@ -630,7 +602,7 @@ if ($result->num_rows > 0):
                 if (res.status === 'success') {
                     $("a[data-member-id='" + memberToDelete + "']").closest('tr').remove();
                     $('#confirmDeleteModal').modal('hide');
-                    filterTable();
+                    location.reload();
                 } else {
                     alert(res.message);
                 }

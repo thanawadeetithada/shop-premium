@@ -274,23 +274,24 @@ $result = $conn->query($sql);
         <div class="container">
             <h2>แอปพลิเคชัน</h2>
 
-            <div class="row mb-5">
-                <div class="col-6 d-flex justify-content-start align-items-center gap-2">
-                    <?php 
-                        $today = date('d'); // ดึงวันที่ปัจจุบัน (01-31)
-                        $blinkClass = ($today == '01' || $today == '15') ? 'blink-btn' : '';
-                    ?>
-                    <a class="btn btn-primary <?php echo $blinkClass; ?>" data-bs-toggle="modal"
-                        data-bs-target="#sendtoEmailModal">
-                        Send SQL to Email
-                    </a>
-                </div>
-                <div class="col-6 d-flex justify-content-end align-items-center gap-2">
-                    <input type="text" id="searchInput" class="form-control" style="max-width: 300px;"
-                        placeholder="ค้นหาแอปพลิเคชัน...">
-                    <a href="add_applications.php" class="btn btn-warning btn-add px-4 mb-0">เพิ่ม</a>
-                </div>
-            </div>
+           <div class="row mb-5 gy-3">
+    <div class="col-12 col-md-5 d-flex justify-content-center justify-content-md-start align-items-center">
+        <?php 
+            $today = date('d'); // ดึงวันที่ปัจจุบัน (01-31)
+            $blinkClass = ($today == '01' || $today == '15') ? 'blink-btn' : '';
+        ?>
+        <a class="btn btn-primary <?php echo $blinkClass; ?>" data-bs-toggle="modal"
+            data-bs-target="#sendtoEmailModal">
+            Send SQL to Email
+        </a>
+    </div>
+    
+    <div class="col-12 col-md-7 d-flex flex-column flex-md-row justify-content-center justify-content-md-end align-items-center gap-2">
+        <input type="text" id="searchInput" class="form-control w-100" style="max-width: 300px;"
+            placeholder="ค้นหาแอปพลิเคชัน...">
+        <a href="add_applications.php" class="btn btn-warning btn-add px-4 mb-0 text-nowrap">เพิ่ม</a>
+    </div>
+</div>
 
             <div class="row" id="appContainer">
                 <?php if ($result->num_rows > 0): ?>

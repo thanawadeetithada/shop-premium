@@ -257,16 +257,24 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 </div>
                 <div class="mb-3">
                     <label>รูปแบบการชำระ (เลขบัตร)</label>
-                    <input type="text" name="payment_info" class="form-control" placeholder="กรอกเลขบัตร หรือข้อมูลการชำระเงิน">
+                    <input type="text" name="payment_info" class="form-control"
+                        placeholder="กรอกเลขบัตร หรือข้อมูลการชำระเงิน">
                 </div>
                 <div class="mb-3">
                     <label>หมายเหตุ</label>
                     <textarea name="note" class="form-control"></textarea>
                 </div>
-                <div class="text-center">
-                    <button type="submit" class="btn btn-purple">เพิ่ม</button>
-                    <button type="button" class="btn btn-cancel"
-                        onclick="window.location.href='detail_application.php?id=<?php echo $app_id; ?>'">ยกเลิก</button>
+                <div class="d-flex justify-content-center gap-3 mt-4">
+                    <button type="submit" class="btn btn-purple flex-fill py-2 m-0"
+                        style="max-width: 180px; font-size: 16px;">
+                        เพิ่ม
+                    </button>
+                    <button type="button"
+                        class="btn btn-cancel flex-fill py-2 m-0 d-flex align-items-center justify-content-center"
+                        style="max-width: 180px; font-size: 16px;"
+                        onclick="window.location.href='detail_application.php?id=<?php echo $app_id; ?>'">
+                        ยกเลิก
+                    </button>
                 </div>
             </form>
         </div>

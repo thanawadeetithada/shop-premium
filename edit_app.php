@@ -197,9 +197,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     <input type="number" name="real_price" class="form-control" step="0.01"
                         value="<?=htmlspecialchars($app['real_price'])?>" required>
                 </div>
-                <div class="text-center">
-                    <button type="submit" class="btn btn-purple">บันทึก</button>
-                    <a href="detail_application.php?id=<?=$app_id?>" class="btn btn-cancel">ยกเลิก</a>
+                <div class="d-flex justify-content-center gap-3 mt-4">
+                    <button type="submit" class="btn btn-purple flex-fill py-2 m-0"
+                        style="max-width: 180px; font-size: 16px;">
+                        บันทึก
+                    </button>
+                    <a href="detail_application.php?id=<?=$app_id?>"
+                        class="btn btn-cancel flex-fill py-2 m-0 d-flex align-items-center justify-content-center"
+                        style="max-width: 180px; font-size: 16px;">
+                        ยกเลิก
+                    </a>
                 </div>
             </form>
         </div>

@@ -182,28 +182,28 @@ $result_family = $stmt_family->get_result();
             </div>
             <h2 class="text-center mb-4"><?php echo htmlspecialchars($app['app_name']); ?></h2>
             <p class="text-center mb-4">ราคา <?php echo htmlspecialchars($app['real_price']); ?> ฿</p>
-            <div class="d-flex justify-content-between align-items-center mb-3"
-                style="margin-left: 1%; margin-right: 1%;">
 
-                <div class="d-flex gap-2">
-                    <a href="edit_app.php?app_id=<?php echo $app_id; ?>" class="btn btn-warning">
+            <div class="row mb-4 gy-3" style="margin-left: 0; margin-right: 0;">
+                <div class="col-12 col-md-6 d-flex justify-content-center justify-content-md-start gap-2">
+                    <a href="edit_app.php?app_id=<?php echo $app_id; ?>"
+                        class="btn btn-warning flex-fill flex-md-grow-0">
                         <i class="fa-solid fa-pen-to-square"></i> แก้ไข
                     </a>
-                    <a href="#" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#deleteAppModal"
-                        data-app-id="<?php echo $app_id; ?>">
+                    <a href="#" class="btn btn-danger flex-fill flex-md-grow-0" data-bs-toggle="modal"
+                        data-bs-target="#deleteAppModal" data-app-id="<?php echo $app_id; ?>">
                         <i class="fa-solid fa-trash-can"></i> ลบแอปพลิเคชัน
                     </a>
                 </div>
 
-                <div class="d-flex gap-2 align-items-center">
-                    <input type="text" id="searchInput" class="form-control" style="width: 250px;"
+                <div
+                    class="col-12 col-md-6 d-flex flex-column flex-md-row justify-content-center justify-content-md-end align-items-center gap-2">
+                    <input type="text" id="searchInput" class="form-control w-100" style="max-width: 300px;"
                         placeholder="ค้นหากลุ่ม...">
                     <a href="add_family.php?app_id=<?php echo $app_id; ?>" class="btn btn-primary text-nowrap">
                         <i class="fa-solid fa-plus"></i> เพิ่มกลุ่ม
                     </a>
                 </div>
             </div>
-
             <div class="row">
                 <?php if ($result_family->num_rows > 0): ?>
                 <?php while ($row = $result_family->fetch_assoc()): ?>
@@ -253,9 +253,10 @@ $result_family = $stmt_family->get_result();
                     </a>
                 </div>
                 <?php endwhile; ?>
-                
+
                 <div class="col-12" id="noResultMsg" style="display: none;">
-                    <p class="text-center text-muted mt-4"><i class="fa-solid fa-circle-info"></i> ไม่พบกลุ่มที่ค้นหา</p>
+                    <p class="text-center text-muted mt-4"><i class="fa-solid fa-circle-info"></i> ไม่พบกลุ่มที่ค้นหา
+                    </p>
                 </div>
 
                 <?php else: ?>
@@ -309,7 +310,7 @@ $result_family = $stmt_family->get_result();
                 cards.forEach(function(card) {
                     // ค้นหาจากชื่อกลุ่ม (แท็ก h4)
                     const groupName = card.querySelector('h4').textContent.toLowerCase();
-                    
+
                     if (groupName.includes(filter)) {
                         card.style.display = '';
                         hasResult = true;

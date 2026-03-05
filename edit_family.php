@@ -282,17 +282,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 </div>
                 <div class="mb-3">
                     <label>รูปแบบการชำระ (เลขบัตร)</label>
-                    <input type="text" name="payment_info" class="form-control" 
-                        value="<?=htmlspecialchars($family['payment_img'])?>"
-                        placeholder="กรอกเลขบัตรใหม่">
+                    <input type="text" name="payment_info" class="form-control"
+                        value="<?=htmlspecialchars($family['payment_img'])?>" placeholder="กรอกเลขบัตรใหม่">
                 </div>
                 <div class="mb-3">
                     <label>หมายเหตุ</label>
                     <textarea name="note" class="form-control"><?=htmlspecialchars($family['note'])?></textarea>
                 </div>
-                <div class="text-center">
-                    <button type="submit" class="btn btn-purple">บันทึก</button>
-                    <button type="button" class="btn btn-cancel"
+                <div class="d-flex justify-content-center gap-3 mt-4">
+                    <button type="submit" class="btn btn-purple flex-fill py-2 m-0"
+                        style="max-width: 180px; font-size: 16px;">
+                        บันทึก
+                    </button>
+                    <button type="button"
+                        class="btn btn-cancel flex-fill py-2 m-0 d-flex align-items-center justify-content-center"
+                        style="max-width: 180px; font-size: 16px;"
                         onclick="window.location.href='dashboard_family.php?family_id=<?= $family_id ?>&app_id=<?= $app_id ?>&from=<?= $back_url ?>'">
                         ยกเลิก
                     </button>

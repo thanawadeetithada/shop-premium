@@ -253,16 +253,13 @@ $current_month_thai = $thai_months[date("m")];
             </ul>
         </div>
     </div>
-    <div class="text-start mb-3">
+     <div class="text-start mb-3 mt-3 px-4">
         <a href="javascript:void(0);" onclick="window.history.back();" class="btn">
             <i class="fa-solid fa-arrow-left"></i> กลับ
         </a>
     </div>
     <div class="card">
-        <div class="header-card">
-            <h3 class="text-left">ข้อมูลกลุ่ม</h3>
-        </div>
-        <br>
+        <h3 class="text-left mb-4">ข้อมูลกลุ่ม</h3>
         <div class="table-responsive">
             <table class="table table-bordered">
                 <thead>
@@ -351,22 +348,22 @@ echo "</td>
     echo "</td>
         <td>$note</td>
         <td>
-            <a href='edit_family.php?family_id=" . $family['family_id'] . "&app_id=" . $app_id . "&from=" . $back_url . "' 
-                class='btn btn-warning btn-sm'>
-                <i class='fa-solid fa-pencil'></i>
-            </a>
-            &nbsp;
-            <button class='btn btn-primary btn-sm'
-                data-bs-toggle='modal'
-                data-bs-target='#addMonthFamilyModal'>
-                <i class='fa-regular fa-calendar-check'></i>
-            </button>
-            &nbsp;
-            <button class='btn btn-danger btn-sm'
-                data-bs-toggle='modal'
-                data-bs-target='#deleteFamilyModal'>
-                <i class='fa-regular fa-trash-can'></i>
-            </button>
+            <div class='d-flex justify-content-center align-items-center gap-2 flex-wrap flex-xl-nowrap'>
+                <a href='edit_family.php?family_id=" . $family['family_id'] . "&app_id=" . $app_id . "&from=" . $back_url . "' 
+                    class='btn btn-warning btn-sm'>
+                    <i class='fa-solid fa-pencil'></i>
+                </a>
+                <button class='btn btn-primary btn-sm'
+                    data-bs-toggle='modal'
+                    data-bs-target='#addMonthFamilyModal'>
+                    <i class='fa-regular fa-calendar-check'></i>
+                </button>
+                <button class='btn btn-danger btn-sm'
+                    data-bs-toggle='modal'
+                    data-bs-target='#deleteFamilyModal'>
+                    <i class='fa-regular fa-trash-can'></i>
+                </button>
+            </div>
         </td>
     </tr>";
 } else {
@@ -519,20 +516,21 @@ if ($result_members->num_rows > 0) {
                         <td><?= $pay_status ?></td>
                         <td><?= $slip_img ?></td>
                         <td>
-                            <a href="edit_member.php?member_id=<?= $member['member_id'] ?>&family_id=<?= $family_id ?>&app_id=<?= $app_id ?>&from=<?= $back_url ?>"
-                                class="btn btn-warning btn-sm">
-                                <i class="fa-solid fa-pencil"></i>
-                            </a>
-                            &nbsp;
-                            <button class="btn btn-primary btn-sm" data-bs-toggle="modal"
-                                data-bs-target="#addMonthModal<?= $member['member_id'] ?>">
-                                <i class="fa-regular fa-calendar-check"></i>
-                            </button>
-                            &nbsp;
-                            <button class="btn btn-danger btn-sm" data-bs-toggle="modal"
-                                data-bs-target="#deleteModal<?= $member['member_id'] ?>">
-                                <i class="fa-regular fa-trash-can"></i>
-                            </button>
+                            <div
+                                class="d-flex justify-content-center align-items-center gap-2 flex-wrap flex-xl-nowrap">
+                                <a href="edit_member.php?member_id=<?= $member['member_id'] ?>&family_id=<?= $family_id ?>&app_id=<?= $app_id ?>&from=<?= $back_url ?>"
+                                    class="btn btn-warning btn-sm">
+                                    <i class="fa-solid fa-pencil"></i>
+                                </a>
+                                <button class="btn btn-primary btn-sm" data-bs-toggle="modal"
+                                    data-bs-target="#addMonthModal<?= $member['member_id'] ?>">
+                                    <i class="fa-regular fa-calendar-check"></i>
+                                </button>
+                                <button class="btn btn-danger btn-sm" data-bs-toggle="modal"
+                                    data-bs-target="#deleteModal<?= $member['member_id'] ?>">
+                                    <i class="fa-regular fa-trash-can"></i>
+                                </button>
+                            </div>
                         </td>
                     </tr>
 
@@ -700,19 +698,23 @@ if ($result_members->num_rows > 0) {
                 <form action="update_family_payday.php" method="POST">
                     <input type="hidden" name="family_id" value="<?php echo $family['family_id']; ?>">
                     <input type="hidden" name="app_id" value="<?php echo $app_id; ?>">
-                    
-                    <div class="modal-header bg-primary text-white position-relative flex-column align-items-center py-3">
+
+                    <div
+                        class="modal-header bg-primary text-white position-relative flex-column align-items-center py-3">
                         <h5 class="modal-title mb-1">จ่ายแล้วเดือนนี้</h5>
                         <h6 class="mb-0">เดือน <?= $current_month_thai ?></h6>
-                        <button type="button" class="btn-close btn-close-white position-absolute top-0 end-0 m-3" data-bs-dismiss="modal"></button>
+                        <button type="button" class="btn-close btn-close-white position-absolute top-0 end-0 m-3"
+                            data-bs-dismiss="modal"></button>
                     </div>
 
                     <div class="modal-body text-center py-4">
                         <div class="row mb-3 text-start">
                             <div class="col-md-12">
                                 <label class="form-label">รอบชำระใหม่ (เดือนถัดไป)</label>
-                                <input type="date" name="pay_day" class="form-control" value="<?= $next_pay_day ?>" required>
-                                <small class="text-muted mt-1 d-block">ระบบคำนวณบวกเพิ่มให้ 1 เดือนจากรอบเดิมโดยอัตโนมัติ</small>
+                                <input type="date" name="pay_day" class="form-control" value="<?= $next_pay_day ?>"
+                                    required>
+                                <small class="text-muted mt-1 d-block">ระบบคำนวณบวกเพิ่มให้ 1
+                                    เดือนจากรอบเดิมโดยอัตโนมัติ</small>
                             </div>
                         </div>
                     </div>

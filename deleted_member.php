@@ -50,7 +50,7 @@ $result_members = $stmt_members->get_result();
     <meta name="apple-mobile-web-app-title" content="App Premium">
     <meta name="application-name" content="App Premium">
     <meta name="theme-color" content="#96a1cd">
-    <title>ข้อมูลกลุ่ม</title>
+    <title>ข้อมูลกลุ่ม (สมาชิกที่ถูกลบ)</title>
     <link rel="manifest" href="manifest.json">
     <link rel="apple-touch-icon" href="icons/icon-192.png">
     <link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png">
@@ -61,7 +61,8 @@ $result_members = $stmt_members->get_result();
     <style>
     body {
         font-family: 'Prompt', sans-serif;
-        height: 100vh;
+        height: auto;
+        min-height: 100vh;
         background: url('bg/sky.png') no-repeat center center/cover;
         margin: 0;
     }
@@ -73,14 +74,13 @@ $result_members = $stmt_members->get_result();
         background: white;
         margin-top: 50px;
         margin: 3% 5%;
-        background-color: #ffffff;
     }
 
     .table th,
     .table td {
         text-align: center;
         font-size: 14px;
-
+        vertical-align: middle;
     }
 
     .table {
@@ -91,46 +91,6 @@ $result_members = $stmt_members->get_result();
     .table th {
         background-color: #f9fafc;
         color: black;
-    }
-
-    .modal-dialog {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        min-height: 100vh;
-
-    }
-
-    .modal-content {
-        width: 100%;
-        max-width: 500px;
-    }
-
-    .header-card {
-        display: flex;
-        justify-content: space-between;
-        flex-wrap: wrap;
-        gap: 15px;
-    }
-
-    .form-control modal-text {
-        height: fit-content;
-        width: 50%;
-    }
-
-    .btn-action {
-        display: flex;
-        justify-content: center;
-        align-items: center;
-    }
-
-
-    .modal-text {
-        width: 100%;
-    }
-
-    .modal-header {
-        font-weight: bold;
     }
 
     .nav-item a {
@@ -144,38 +104,6 @@ $result_members = $stmt_members->get_result();
 
     .nav-link:hover {
         color: white;
-    }
-
-    .modal-body {
-        padding: 10px 40px;
-    }
-
-    .search-add {
-        display: flex;
-        gap: 15px;
-        align-items: center;
-    }
-
-    .tab-func {
-        display: flex;
-        justify-content: flex-start;
-        align-items: center;
-    }
-
-    @media (max-width: 768px) {
-        .search-add {
-            flex-direction: row;
-            gap: 10px;
-        }
-
-        .search-name {
-            width: 20%;
-            flex: 1;
-        }
-
-        .tab-func button {
-            width: max-content;
-        }
     }
 
     .table img:hover {
@@ -246,17 +174,15 @@ $result_members = $stmt_members->get_result();
             </ul>
         </div>
     </div>
-    <div class="text-start mb-3">
+
+    <div class="text-start mb-3 mt-3 px-4">
         <a href="<?= htmlspecialchars($back_url) ?>" class="btn">
             <i class="fa-solid fa-arrow-left"></i> กลับ
         </a>
-
     </div>
+
     <div class="card">
-        <div class="header-card">
-            <h3 class="text-left">ข้อมูลกลุ่ม</h3>
-        </div>
-        <br>
+        <h3 class="text-left mb-4">ข้อมูลกลุ่ม</h3>
         <div class="table-responsive">
             <table class="table table-bordered">
                 <thead>
@@ -272,7 +198,6 @@ $result_members = $stmt_members->get_result();
                         <th>ราคาจริง (บาท/เดือน)</th>
                         <th>รูปแบบการชำระ</th>
                         <th>หมายเหตุ</th>
-                        <th>จัดการ</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -327,27 +252,23 @@ echo "</td>
         <td>$real_price</td>
         <td>";
     if (!empty($family['payment_img'])) {
-        echo "<img src='" . htmlspecialchars($family['payment_img']) . "' 
-            width='100' height='100' 
-            style='border-radius:5px; cursor:pointer;' 
-            onclick=\"showSlipModal('" . htmlspecialchars($family['payment_img']) . "')\">";
+        $raw_payment = $family['payment_img'];
+        $len = mb_strlen($raw_payment, 'UTF-8');
+        
+        echo "<span class='payment-mask'>";
+        if ($len > 3) {
+            echo 'XXXXXX' . htmlspecialchars(mb_substr($raw_payment, -3, 3, 'UTF-8'));
+        } elseif ($len > 0) {
+            echo htmlspecialchars($raw_payment);
+        } else {
+            echo "-";
+        }
+        echo "</span>";
     } else {
         echo "-";
     }
     echo "</td>
         <td>$note</td>
-        <td>
-             <a href='edit_family.php?family_id=" . $family['family_id'] . "&app_id=" . $app_id . "&from=" . $back_url . "' 
-       class='btn btn-warning btn-sm'>
-        <i class='fa-solid fa-pencil'></i>
-    </a>
-            &nbsp;
-            <button class='btn btn-danger btn-sm'
-                data-bs-toggle='modal'
-                data-bs-target='#deleteFamilyModal'>
-                <i class='fa-regular fa-trash-can'></i>
-            </button>
-        </td>
     </tr>";
 } else {
     echo "<tr>
@@ -358,27 +279,18 @@ echo "</td>
 }
 ?>
                 </tbody>
-
             </table>
         </div>
     </div>
 
     <div class="card">
-        <div class="header-card">
-            <h3 class="text-left">ข้อมูลสมาชิก</h3>
-            <div class="search-add">
-                <div class="tab-func">
-                    <button type="button" class="btn btn-primary"
-                        onclick="window.location.href='add_member.php?family_id=<?php echo $family_id; ?>&app_id=<?php echo $app_id; ?>'">
-                        เพิ่มสมาชิก
-                    </button>
-                </div>
-                <div class="tab-func">
-                    <input type="text" class="form-control search-name" placeholder="ค้นหา...">
-                </div>
+        <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-4 gap-3">
+            <h3 class="mb-0">ข้อมูลสมาชิก (ที่ถูกลบ)</h3>
+            <div class="d-flex gap-2">
+                <input type="text" class="form-control search-name" style="max-width: 250px;" placeholder="ค้นหา...">
             </div>
         </div>
-        <br>
+
         <div class="table-responsive">
             <table id="memberTable" class="table table-bordered">
                 <thead>
@@ -398,14 +310,13 @@ echo "</td>
                         <th>สถานะ</th>
                         <th>สถานะการจ่ายเงิน</th>
                         <th>รูปสลิป</th>
-                        <th>จัดการ</th>
                     </tr>
                 </thead>
                 <tbody>
                     <?php
 if ($result_members->num_rows > 0) {
-            $no = 1;
-            $today = date("Y-m-d");
+    $no = 1;
+    $today = date("Y-m-d");
     while ($member = $result_members->fetch_assoc()) {
 
         $member_name   = !empty($member['member_name']) ? htmlspecialchars($member['member_name']) : '-';
@@ -414,61 +325,24 @@ if ($result_members->num_rows > 0) {
         $screen        = !empty($member['screen']) ? htmlspecialchars($member['screen']) : '-';
         $device        = !empty($member['device']) ? htmlspecialchars($member['device']) : '-';
         $days          = isset($member['days']) && $member['days'] !== '' ? htmlspecialchars($member['days']) : '-';
-        $start_date    = (!empty($member['start_date']) && $member['start_date'] !== '0000-00-00')
-                            ? date("d/m/Y", strtotime($member['start_date'])) : '-';
-       $expire_date = (!empty($member['expire_date']) && $member['expire_date'] !== '0000-00-00')
-               ? date("d/m/Y", strtotime($member['expire_date'])) 
-               : '-';
-        $pay_day_display = (!empty($family['pay_day']) && $family['pay_day'] !== '0000-00-00')
-                            ? date("d/m/Y", strtotime($family['pay_day'])) : '-';
-
-        if (!empty($member['status'])) {
-            if ($member['status'] === 'admin') {
-                $status = 'แอดมิน';
-            } elseif ($member['status'] === 'user') {
-                $status = 'ผู้ใช้งาน';
-            } else {
-                $status = htmlspecialchars($member['status']);
-            }
-        } else {
-            $status = '-';
-        }
-
-        if (!empty($member['pay_status'])) {
-            if ($member['pay_status'] === 'paid') {
-                $pay_status = 'จ่ายแล้ว';
-            } elseif ($member['pay_status'] === 'unpaid') {
-                $pay_status = 'ยังไม่ได้จ่าย';
-            } else {
-                $pay_status = htmlspecialchars($member['pay_status']);
-            }
-        } else {
-            $pay_status = '-';
-        }
+        
+        $start_date    = (!empty($member['start_date']) && $member['start_date'] !== '0000-00-00') ? date("d/m/Y", strtotime($member['start_date'])) : '-';
+        $expire_date   = (!empty($member['expire_date']) && $member['expire_date'] !== '0000-00-00') ? date("d/m/Y", strtotime($member['expire_date'])) : '-';
+        
+        $status = (!empty($member['status'])) ? ($member['status'] === 'admin' ? 'แอดมิน' : ($member['status'] === 'user' ? 'ผู้ใช้งาน' : htmlspecialchars($member['status']))) : '-';
+        $pay_status = (!empty($member['pay_status'])) ? ($member['pay_status'] === 'paid' ? 'จ่ายแล้ว' : ($member['pay_status'] === 'unpaid' ? 'ยังไม่ได้จ่าย' : htmlspecialchars($member['pay_status']))) : '-';
 
         $slip_img = !empty($member['slip_img'])
-            ? "<img src='" . htmlspecialchars($member['slip_img']) . "' 
-                width='80' height='80' 
-                style='border-radius:5px; cursor:pointer;' 
-                onclick=\"showSlipModal('" . htmlspecialchars($member['slip_img']) . "')\">"
-                : "-";
+            ? "<img src='" . htmlspecialchars($member['slip_img']) . "' width='80' height='80' style='border-radius:5px; cursor:pointer;' onclick=\"showSlipModal('" . htmlspecialchars($member['slip_img']) . "')\">"
+            : "-";
 
-        $price_per_day = isset($member['price_per_day']) && $member['price_per_day'] !== ''
-            ? htmlspecialchars($member['price_per_day'])
-            : '-';
+        $price_per_day = isset($member['price_per_day']) && $member['price_per_day'] !== '' ? htmlspecialchars($member['price_per_day']) : '-';
 
         $expire_date_db = $member['expire_date'];
         $row_class = '';
-
-        if (!empty($expire_date_db) && $expire_date_db !== '0000-00-00') {
-            $expire_timestamp = strtotime($expire_date_db);
-            $today_timestamp = strtotime($today);
-
-            if (!empty($expire_date_db) && $expire_date_db !== '0000-00-00' && $expire_date_db <= $today) {
+        if (!empty($expire_date_db) && $expire_date_db !== '0000-00-00' && $expire_date_db <= $today) {
             $row_class = 'blink-red';
         }
-    }
-
         ?>
 
                     <tr class="<?= $row_class ?>">
@@ -480,105 +354,30 @@ if ($result_members->num_rows > 0) {
                         <td><?= $screen ?></td>
                         <td><?= $device ?></td>
                         <td><?= $days ?></td>
-                        <td><?= (!empty($member['start_date']) && $member['start_date'] !== '0000-00-00') ? date("d/m/Y", strtotime($member['start_date'])) : '-' ?>
+                        <td><?= $start_date ?></td>
+                        <td><?= $expire_date ?></td>
+                        <td><?= (!empty($member['transfer_time']) && $member['transfer_time'] !== '0000-00-00 00:00:00') ? date("d/m/Y H:i", strtotime($member['transfer_time'])) : '-' ?>
                         </td>
-                        <td><?= (!empty($member['expire_date']) && $member['expire_date'] !== '0000-00-00') ? date("d/m/Y", strtotime($member['expire_date'])) : '-' ?>
-                        </td>
-                        <td>
-                            <?php
-                                if (!empty($member['transfer_time']) && $member['transfer_time'] !== '0000-00-00 00:00:00') {
-                                    echo date("d/m/Y H:i", strtotime($member['transfer_time']));
-                                } else {
-                                    echo '-';
-                                }
-                    ?>
-                        </td>
-
                         <td><?= $price_per_day ?></td>
                         <td><?= $status ?></td>
                         <td><?= $pay_status ?></td>
                         <td><?= $slip_img ?></td>
-                        <td>
-                            <a href="edit_member.php?member_id=<?= $member['member_id'] ?>&family_id=<?= $family_id ?>&app_id=<?= $app_id ?>&from=<?= $back_url ?>"
-                                class="btn btn-warning btn-sm">
-                                <i class="fa-solid fa-pencil"></i>
-                            </a>
-                            &nbsp;
-                            <button class="btn btn-danger btn-sm" data-bs-toggle="modal"
-                                data-bs-target="#deleteModal<?= $member['member_id'] ?>">
-                                <i class="fa-regular fa-trash-can"></i>
-                            </button>
-                        </td>
                     </tr>
-
-                    <div class="modal fade" id="deleteModal<?= $member['member_id'] ?>" tabindex="-1">
-                        <div class="modal-dialog modal-dialog-centered">
-                            <div class="modal-content">
-
-                                <div class="modal-header bg-danger text-white">
-                                    <h5 class="modal-title">ยืนยันการลบสมาชิก</h5>
-                                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                                </div>
-
-                                <div class="modal-body text-center py-4">
-                                    คุณต้องการลบสมาชิก
-                                    <b><?= htmlspecialchars($member['member_name']) ?></b>
-                                    ใช่หรือไม่?
-                                </div>
-
-                                <div class="modal-footer justify-content-center">
-                                    <button type="button" class="btn btn-secondary"
-                                        data-bs-dismiss="modal">ยกเลิก</button>
-                                    <a href="delete_member.php?member_id=<?= $member['member_id'] ?>&family_id=<?= $family_id ?>&app_id=<?= $app_id ?>"
-                                        class="btn btn-danger">ลบข้อมูล</a>
-                                </div>
-
-                            </div>
-                        </div>
-                    </div>
                     <?php
-                        $no++;
-                    }
-                    $noResultDisplay = "none";
-                } else {
-                    $noResultDisplay = "table-row";
-                }
-                ?>
+        $no++;
+    }
+    $noResultDisplay = "none";
+} else {
+    $noResultDisplay = "table-row";
+}
+?>
                     <tr id="noResult" style="display: <?= $noResultDisplay ?>;">
-                        <td colspan="13" class="text-center text-muted fw-bold bg-light py-3">
+                        <td colspan="16" class="text-center text-muted fw-bold bg-light py-3">
                             <i class="fa-solid fa-circle-info"></i> ไม่พบข้อมูลที่ค้นหา
                         </td>
                     </tr>
                 </tbody>
-                <tr id="noResult" style="display:none;">
-                    <td colspan="13" class="text-center text-muted fw-bold bg-light py-3">
-                        <i class="fa-solid fa-circle-info"></i> ไม่พบข้อมูลที่ค้นหา
-                    </td>
-                </tr>
             </table>
-        </div>
-    </div>
-
-    <div class="modal fade" id="deleteFamilyModal" tabindex="-1">
-        <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content">
-                <div class="modal-header bg-danger text-white">
-                    <h5 class="modal-title">ยืนยันการลบกลุ่ม</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                </div>
-
-                <div class="modal-body py-4">
-                    คุณต้องการลบกลุ่ม
-                    <b><?php echo htmlspecialchars($family['family_name']); ?></b>
-                    และสมาชิกทั้งหมดในกลุ่มนี้ ใช่หรือไม่?
-                </div>
-
-                <div class="modal-footer justify-content-center">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">ยกเลิก</button>
-                    <a href="delete_family.php?family_id=<?php echo $family['family_id']; ?>&app_id=<?php echo $app_id; ?>"
-                        class="btn btn-danger">ลบข้อมูล</a>
-                </div>
-            </div>
         </div>
     </div>
 
@@ -602,7 +401,6 @@ if ($result_members->num_rows > 0) {
 
         $("#memberTable tbody tr").each(function() {
             if ($(this).attr("id") === "noResult" || $(this).find(".modal-dialog").length > 0) return;
-
             var match = $(this).text().toLowerCase().indexOf(value) > -1;
             $(this).toggle(match);
             if (match) visibleRows++;
@@ -622,14 +420,14 @@ if ($result_members->num_rows > 0) {
         modal.show();
     }
 
-
     document.querySelectorAll("#memberTable tbody tr").forEach(row => {
         if (row.id === "noResult") return;
         row.addEventListener("click", function(e) {
-            if (e.target.tagName === "BUTTON" || e.target.tagName === "A" || e.target.closest('.modal'))
-                return;
-
+            if (e.target.tagName === "BUTTON" || e.target.tagName === "A" || e.target.closest(
+                '.modal') || e.target.closest('.row-check')) return;
             this.classList.toggle("checked");
+            const checkbox = this.querySelector(".row-check");
+            if (checkbox) checkbox.checked = this.classList.contains("checked");
         });
     });
 

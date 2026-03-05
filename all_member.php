@@ -90,7 +90,7 @@ $family_query = $conn->query("SELECT family_id, family_name FROM families WHERE 
     .table td {
         text-align: center;
         font-size: 14px;
-
+        vertical-align: middle;
     }
 
     .table {
@@ -119,6 +119,7 @@ $family_query = $conn->query("SELECT family_id, family_name FROM families WHERE 
     .header-card {
         display: flex;
         justify-content: space-between;
+        align-items: center;
         flex-wrap: wrap;
         gap: 15px;
     }
@@ -151,36 +152,6 @@ $family_query = $conn->query("SELECT family_id, family_name FROM families WHERE 
 
     .modal-body {
         padding: 10px 40px;
-    }
-
-    .search-add {
-        display: flex;
-        gap: 15px;
-        align-items: center;
-        width: 50%;
-    }
-
-    .tab-func {
-        width: 100%;
-        display: flex;
-        justify-content: flex-start;
-        align-items: center;
-    }
-
-    @media (max-width: 768px) {
-        .search-add {
-            flex-direction: row;
-            gap: 10px;
-        }
-
-        .search-name {
-            width: 20%;
-            flex: 1;
-        }
-
-        .tab-func button {
-            width: max-content;
-        }
     }
 
     .switch {
@@ -320,37 +291,47 @@ $family_query = $conn->query("SELECT family_id, family_name FROM families WHERE 
 
     <div class="card">
         <div class="header-card">
-            <h3 class="text-left">รายชื่อทั้งหมด</h3>
-            <div class="search-add">
-                <div class="tab-func">
-                    <input type="text" class="form-control search-name" placeholder="ค้นหา...">
+            <h3 class="text-left mb-0">รายชื่อทั้งหมด</h3>
+            
+            <div class="row g-2 w-100 mt-2 mt-lg-0 justify-content-end" style="max-width: 900px;">
+                <div class="col-12 col-md-6 col-lg-3">
+                    <input type="text" class="form-control search-name w-100" placeholder="ค้นหา...">
                 </div>
-                <select name="app_name" class="form-control">
-                    <option value="">เลือกแอปพลิเคชัน</option>
-                    <?php while ($app = $app_query->fetch_assoc()): ?>
-                    <option value="<?= htmlspecialchars($app['app_id']) ?>"
-                        data-name="<?= htmlspecialchars(strtolower($app['app_name'])) ?>">
-                        <?= htmlspecialchars($app['app_name']) ?>
-                    </option>
-                    <?php endwhile; ?>
-                </select>
-
-                <select name="family_name" class="form-control">
-                    <option value="">-- เลือกกลุ่ม --</option>
-                    <?php while ($family = $family_query->fetch_assoc()): ?>
-                    <option value="<?= htmlspecialchars($family['family_id']) ?>"
-                        data-name="<?= htmlspecialchars(strtolower($family['family_name'])) ?>">
-                        <?= htmlspecialchars($family['family_name']) ?>
-                    </option>
-                    <?php endwhile; ?>
-                </select>
-                <select name="status_filter" class="form-control">
-                    <option value="">-- สถานะทั้งหมด --</option>
-                    <option value="admin">แอดมิน</option>
-                    <option value="user">ผู้ใช้งาน</option>
-                </select>
-
+                <div class="col-12 col-md-6 col-lg-3">
+                    <select name="app_name" class="form-control w-100">
+                        <option value="">เลือกแอปพลิเคชัน</option>
+                        <?php 
+                        if(isset($app_query)) $app_query->data_seek(0);
+                        while ($app = $app_query->fetch_assoc()): ?>
+                        <option value="<?= htmlspecialchars($app['app_id']) ?>"
+                            data-name="<?= htmlspecialchars(strtolower($app['app_name'])) ?>">
+                            <?= htmlspecialchars($app['app_name']) ?>
+                        </option>
+                        <?php endwhile; ?>
+                    </select>
+                </div>
+                <div class="col-12 col-md-6 col-lg-3">
+                    <select name="family_name" class="form-control w-100">
+                        <option value="">-- เลือกกลุ่ม --</option>
+                        <?php 
+                        if(isset($family_query)) $family_query->data_seek(0);
+                        while ($family = $family_query->fetch_assoc()): ?>
+                        <option value="<?= htmlspecialchars($family['family_id']) ?>"
+                            data-name="<?= htmlspecialchars(strtolower($family['family_name'])) ?>">
+                            <?= htmlspecialchars($family['family_name']) ?>
+                        </option>
+                        <?php endwhile; ?>
+                    </select>
+                </div>
+                <div class="col-12 col-md-6 col-lg-3">
+                    <select name="status_filter" class="form-control w-100">
+                        <option value="">-- สถานะทั้งหมด --</option>
+                        <option value="admin">แอดมิน</option>
+                        <option value="user">ผู้ใช้งาน</option>
+                    </select>
+                </div>
             </div>
+            
         </div>
         <br>
         <div class="table-responsive">
@@ -396,7 +377,8 @@ $family_query = $conn->query("SELECT family_id, family_name FROM families WHERE 
                             <?= htmlspecialchars($row['status'] === 'admin' ? 'แอดมิน' : 'ผู้ใช้งาน') ?>
                         </td>
                         <td class='btn-action'>
-                            <a href="<?php 
+                            <div class="d-flex justify-content-center align-items-center gap-2 flex-wrap flex-xl-nowrap">
+                                <a href="<?php 
         if ($disabled) {
             echo 'deleted_member.php?family_id=' . htmlspecialchars($row['family_id']) .
                  '&app_id=' . htmlspecialchars($row['app_id']) .
@@ -407,21 +389,22 @@ $family_query = $conn->query("SELECT family_id, family_name FROM families WHERE 
                  '&from=all_member.php';
         }
     ?>" class="btn btn-warning btn-sm">
-                                <i class="fa-solid fa-arrow-right"></i>
-                            </a>
+                                    <i class="fa-solid fa-arrow-right"></i>
+                                </a>
+                            </div>
                         </td>
                     </tr>
 
                     <?php endwhile; ?>
                     <?php else: ?>
                     <tr>
-                        <td colspan="12" class="text-center text-muted">ไม่มีข้อมูล</td>
+                        <td colspan="13" class="text-center text-muted">ไม่มีข้อมูล</td>
                     </tr>
                     <?php endif; ?>
                 </tbody>
 
                 <tr id="noResult" style="display:none;">
-                    <td colspan="12" class="text-center text-muted fw-bold bg-light py-3">
+                    <td colspan="13" class="text-center text-muted fw-bold bg-light py-3">
                         <i class="fa-solid fa-circle-info"></i> ไม่พบข้อมูลที่ค้นหา
                     </td>
                 </tr>
@@ -466,7 +449,6 @@ $family_query = $conn->query("SELECT family_id, family_name FROM families WHERE 
             currentPage = page;
             renderPagination();
         }
-
 
         function renderPagination() {
             var totalRows = filteredRows.length;
@@ -548,7 +530,6 @@ $family_query = $conn->query("SELECT family_id, family_name FROM families WHERE 
         }
 
         $("select[name='status_filter']").on("change", filterTable);
-
 
         $(".search-name").on("keyup", filterTable);
         $("select[name='app_name'], select[name='family_name']").on("change", filterTable);

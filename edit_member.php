@@ -467,7 +467,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                             onclick="showSlipModal(this.src)">
                     </div>
 
-                    <div class="text-center">
+                      <div class="text-center btn-group-responsive mt-4">
                         <button type="submit" class="btn btn-purple">บันทึก</button>
                         <a href="dashboard_family.php?family_id=<?= $family_id ?>&app_id=<?= $app_id ?>&from=<?= $back_url ?>"
                             class="btn btn-cancel">ยกเลิก</a>
