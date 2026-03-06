@@ -22,7 +22,7 @@ try {
     if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         
         $input_email = isset($_POST['email']) ? trim($_POST['email']) : '';
-        $default_email = 'baifern24260@gmail.com'; 
+        $default_email = 'thanawadeetit@gmail.com'; 
 
         // จัดการรายชื่ออีเมลที่จะส่ง
         $target_emails = [];

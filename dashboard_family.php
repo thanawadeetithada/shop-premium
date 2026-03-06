@@ -253,10 +253,11 @@ $current_month_thai = $thai_months[date("m")];
             </ul>
         </div>
     </div>
-     <div class="text-start mb-3 mt-3 px-4">
-        <a href="javascript:void(0);" onclick="window.history.back();" class="btn">
+    <div class="text-start mb-3 mt-3 px-4">
+        <a href="<?= htmlspecialchars($back_url) ?>" class="btn">
             <i class="fa-solid fa-arrow-left"></i> กลับ
         </a>
+    </div>
     </div>
     <div class="card">
         <h3 class="text-left mb-4">ข้อมูลกลุ่ม</h3>
@@ -385,6 +386,10 @@ echo "</td>
             <h3 class="text-left">ข้อมูลสมาชิก</h3>
             <div class="search-add">
                 <div class="tab-func">
+                    <button type="button" class="btn btn-outline-primary me-2" data-bs-toggle="modal"
+                        data-bs-target="#addAllUsersMonthModal">
+                        <i class="fa-solid fa-plus"></i>
+                    </button>
                     <button type="button" class="btn btn-primary"
                         onclick="window.location.href='add_member.php?family_id=<?php echo $family_id; ?>&app_id=<?php echo $app_id; ?>'">
                         เพิ่มสมาชิก
@@ -722,6 +727,64 @@ if ($result_members->num_rows > 0) {
                     <div class="modal-footer justify-content-center">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">ยกเลิก</button>
                         <button type="submit" class="btn btn-primary">รอบชำระใหม่</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <?php
+        // คำนวณวันที่เริ่มต้นและสิ้นสุดสำหรับ Modal อัปเดตรวม
+        $pay_day_num_all = (!empty($family['pay_day']) && $family['pay_day'] !== '0000-00-00') ? date('d', strtotime($family['pay_day'])) : date('d');
+        $curr_y_all = date('Y');
+        $curr_m_all = date('m');
+        $max_day_curr_all = date('t', strtotime("$curr_y_all-$curr_m_all-01"));
+        $actual_start_day_all = ($pay_day_num_all > $max_day_curr_all) ? $max_day_curr_all : $pay_day_num_all;
+        $calc_start_date_all = date("Y-m-d", strtotime("$curr_y_all-$curr_m_all-$actual_start_day_all"));
+        
+        $next_m_all = $curr_m_all + 1;
+        $next_y_all = $curr_y_all;
+        if ($next_m_all > 12) {
+            $next_m_all = 1;
+            $next_y_all++;
+        }
+        $max_day_next_all = date('t', strtotime("$next_y_all-$next_m_all-01"));
+        $actual_expire_day_all = ($pay_day_num_all > $max_day_next_all) ? $max_day_next_all : $pay_day_num_all;
+        $calc_expire_date_all = date("Y-m-d", strtotime("$next_y_all-$next_m_all-$actual_expire_day_all"));
+    ?>
+    <div class="modal fade" id="addAllUsersMonthModal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <form action="add_month_all.php" method="POST">
+                    <input type="hidden" name="family_id" value="<?= $family_id ?>">
+                    <input type="hidden" name="app_id" value="<?= $app_id ?>">
+                    <input type="hidden" name="from" value="<?= htmlspecialchars($back_url) ?>">
+
+                    <div class="modal-header bg-primary text-white position-relative flex-column align-items-center py-3">
+                        <h5 class="modal-title mb-1">จ่ายแล้วเดือนนี้ (เฉพาะ User)</h5>
+                        <h6 class="mb-0">เดือน <?= $current_month_thai ?></h6>
+                        <button type="button" class="btn-close btn-close-white position-absolute top-0 end-0 m-3" data-bs-dismiss="modal"></button>
+                    </div>
+
+                    <div class="modal-body text-center py-4">
+                        <div class="alert alert-info text-start" role="alert">
+                            <i class="fa-solid fa-circle-info"></i> ระบบจะปรับวันที่ให้กับสมาชิกทุกคนในกลุ่มนี้ที่มีสถานะเป็น <b>ผู้ใช้งาน (user)</b> เท่านั้น
+                        </div>
+                        <div class="row mb-3 text-start">
+                            <div class="col-md-6">
+                                <label class="form-label">วันเริ่ม</label>
+                                <input type="date" name="start_date" class="form-control" value="<?= $calc_start_date_all ?>" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">วันหมดอายุ</label>
+                                <input type="date" name="expire_date" class="form-control" value="<?= $calc_expire_date_all ?>" required>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="modal-footer justify-content-center">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">ยกเลิก</button>
+                        <button type="submit" class="btn btn-primary">ยืนยันอัปเดตทุกคน</button>
                     </div>
                 </form>
             </div>

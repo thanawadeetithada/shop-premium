@@ -315,7 +315,6 @@ $family_query = $conn->query("SELECT family_id, family_name FROM families WHERE 
     <div class="card">
         <div class="header-card">
             <h3 class="text-left mb-0">แจ้งเตือนรายชื่อหมดอายุ</h3>
-            
             <div class="row g-2 w-100 mt-2 mt-md-0 justify-content-end" style="max-width: 800px;">
                 <div class="col-12 col-md-4">
                     <input type="text" class="form-control search-name w-100" placeholder="ค้นหา...">
@@ -347,7 +346,7 @@ $family_query = $conn->query("SELECT family_id, family_name FROM families WHERE 
                     </select>
                 </div>
             </div>
-            </div>
+        </div>
         <br>
         <div class="table-responsive">
             <table class="table table-bordered" id="memberTable">
@@ -409,8 +408,9 @@ if ($result->num_rows > 0):
                         <td><?= htmlspecialchars($row['expire_date']) ?></td>
                         <td><?= htmlspecialchars($row['transfer_time']) ?></td>
                         <td class='btn-action'>
-                            <div class="d-flex justify-content-center align-items-center gap-2 flex-wrap flex-xl-nowrap">
-                                <a href="dashboard_family.php?family_id=<?= $row['family_id'] ?>&app_id=<?= $row['app_id'] ?>&from=detail_application.php?id=<?= $row['app_id'] ?>"
+                            <div
+                                class="d-flex justify-content-center align-items-center gap-2 flex-wrap flex-xl-nowrap">
+                                <a href="dashboard_family.php?family_id=<?= $row['family_id'] ?>&app_id=<?= $row['app_id'] ?>&from=check_list.php"
                                     class="btn btn-warning btn-sm">
                                     <i class="fa-solid fa-file-import"></i>
                                 </a>
@@ -557,18 +557,18 @@ if ($result->num_rows > 0):
             var visibleRows = 0;
 
             filteredRows = $tableRows.filter(function() {
-                var memberName = $(this).find("td:eq(1)").text().toLowerCase(); 
-                var appName = $(this).find("td:eq(3)").text().toLowerCase(); 
-                var familyName = $(this).find("td:eq(4)").text().toLowerCase(); 
-                var email = $(this).find("td:eq(5)").text().toLowerCase(); 
-                var device = $(this).find("td:eq(6)").text().toLowerCase(); 
-                var screen = $(this).find("td:eq(7)").text().toLowerCase(); 
+                var memberName = $(this).find("td:eq(1)").text().toLowerCase();
+                var appName = $(this).find("td:eq(3)").text().toLowerCase();
+                var familyName = $(this).find("td:eq(4)").text().toLowerCase();
+                var email = $(this).find("td:eq(5)").text().toLowerCase();
+                var device = $(this).find("td:eq(6)").text().toLowerCase();
+                var screen = $(this).find("td:eq(7)").text().toLowerCase();
 
                 var matchSearch = nameFilter === "" ||
                     memberName.includes(nameFilter) ||
                     device.includes(nameFilter) ||
                     screen.includes(nameFilter) ||
-                    email.includes(nameFilter); 
+                    email.includes(nameFilter);
 
                 var matchApp = appFilter === "" || appName.includes(appFilter);
                 var matchFamily = familyFilter === "" || familyName.includes(familyFilter);
